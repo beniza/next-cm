@@ -19,6 +19,9 @@ It records:
 - Minute deltas per candidate and total
 - Alerts for anomalies or errors
 
+Dependencies:
+- Uses only Python standard library packages (no third-party pip dependencies).
+
 ## Files
 - `tracker.py`: polling loop, anomaly detection, dashboard generation
 - `poll_data.csv`: time-series vote snapshots and deltas
