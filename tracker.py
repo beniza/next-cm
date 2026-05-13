@@ -98,50 +98,8 @@ class AnomalyDetector:
 
 
 def generate_dashboard():
-    """Read poll_data.csv and write a self-contained HTML dashboard."""
-    rows = []
-    with open(CSV_FILE, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            if r["total_votes"]:  # skip error rows
-                rows.append(r)
-
-    if not rows:
-        return
-
-    # Build JSON arrays for the chart
-    labels = [r["timestamp"][5:] for r in rows]  # trim year for brevity
-    totals = [int(r["total_votes"]) for r in rows]
-    v_votes = [int(r["kc_venugopal_votes"]) for r in rows]
-    s_votes = [int(r["vd_satheesan_votes"]) for r in rows]
-    c_votes = [int(r["ramesh_chennithala_votes"]) for r in rows]
-    d_total = [int(r["delta_total"]) for r in rows]
-    d_v = [int(r["delta_venugopal"]) for r in rows]
-    d_s = [int(r["delta_satheesan"]) for r in rows]
-    d_c = [int(r["delta_chennithala"]) for r in rows]
-
-    # Aggregate deltas into 10-minute buckets
-    BUCKET_SIZE = 10
-    d_labels_10 = []
-    d_v_10, d_s_10, d_c_10 = [], [], []
-    for i in range(0, len(rows), BUCKET_SIZE):
-        chunk = rows[i:i + BUCKET_SIZE]
-        d_labels_10.append(chunk[-1]["timestamp"][5:])
-        d_v_10.append(sum(int(r["delta_venugopal"]) for r in chunk))
-        d_s_10.append(sum(int(r["delta_satheesan"]) for r in chunk))
-        d_c_10.append(sum(int(r["delta_chennithala"]) for r in chunk))
-
-    # Collect alerts
-    alerts_data = []
-    with open(ALERT_LOG, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for r in reader:
-            alerts_data.append({"ts": r["timestamp"], "msg": r["alert"]})
-
-    latest = rows[-1]
-    updated = latest["timestamp"]
-
-    html = f"""<!DOCTYPE html>
+    """Generate a live dashboard HTML that fetches and parses poll_data.csv."""
+    html = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -149,109 +107,292 @@ def generate_dashboard():
 <title>Kerala CM Poll Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
-  * {{ margin:0; padding:0; box-sizing:border-box; }}
-  body {{ font-family:'Segoe UI',system-ui,sans-serif; background:#0f172a; color:#e2e8f0; padding:20px; }}
-  h1 {{ font-size:1.6rem; color:#f8fafc; margin-bottom:4px; }}
-  .sub {{ color:#94a3b8; font-size:.85rem; margin-bottom:20px; }}
-  .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:24px; }}
-  .card {{ background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; }}
-  .card .label {{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; }}
-  .card .value {{ font-size:1.8rem; font-weight:700; margin-top:4px; }}
-  .card .delta {{ font-size:.8rem; color:#4ade80; margin-top:2px; }}
-  .card.saffron .value {{ color:#FF9933; }}
-  .card.green .value {{ color:#22c55e; }}
-  .card.red .value {{ color:#ef4444; }}
-  .chart-box {{ background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; margin-bottom:20px; }}
-  .chart-box h2 {{ font-size:1rem; color:#cbd5e1; margin-bottom:12px; }}
-  canvas {{ width:100%!important; }}
-  .alerts {{ background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; }}
-  .alerts h2 {{ font-size:1rem; color:#fbbf24; margin-bottom:12px; }}
-  .alerts .empty {{ color:#64748b; font-style:italic; }}
-  .alert-row {{ padding:6px 0; border-bottom:1px solid #334155; font-size:.82rem; }}
-  .alert-row:last-child {{ border-bottom:none; }}
-  .alert-ts {{ color:#94a3b8; margin-right:8px; }}
-  .alert-msg {{ color:#fbbf24; }}
-  .alert-msg.error {{ color:#ef4444; }}
-  .refresh {{ color:#64748b; font-size:.75rem; margin-top:16px; text-align:center; }}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:#0f172a; color:#e2e8f0; padding:20px; }
+  h1 { font-size:1.6rem; color:#f8fafc; margin-bottom:4px; }
+  .sub { color:#94a3b8; font-size:.85rem; margin-bottom:20px; }
+  .top-row { margin-bottom:24px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .card { background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; }
+  .card .label { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; }
+  .card .value { font-size:1.8rem; font-weight:700; margin-top:4px; }
+  .card .delta { font-size:.8rem; color:#4ade80; margin-top:2px; }
+  .pp-trend.up { color:#4ade80; }
+  .pp-trend.down { color:#ef4444; }
+  .pp-trend.flat { color:#fbbf24; }
+  .card.saffron .value { color:#FF9933; }
+  .card.green .value { color:#22c55e; }
+  .card.red .value { color:#ef4444; }
+  .momentum-box { background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; margin-bottom:20px; }
+  .momentum-title { font-size:1rem; color:#cbd5e1; margin-bottom:8px; }
+  .momentum-callout { color:#e2e8f0; font-size:.92rem; margin-bottom:10px; }
+  .share-row { margin-bottom:8px; }
+  .share-row:last-child { margin-bottom:0; }
+  .share-head { display:flex; justify-content:space-between; font-size:.78rem; color:#cbd5e1; margin-bottom:4px; }
+  .share-track { width:100%; height:8px; background:#0f172a; border-radius:999px; overflow:hidden; border:1px solid #334155; }
+  .share-fill { height:100%; border-radius:999px; width:0%; transition:width .35s ease; }
+  .share-fill.saffron { background:#FF9933; }
+  .share-fill.green { background:#22c55e; }
+  .share-fill.red { background:#ef4444; }
+  .chart-box { background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; margin-bottom:20px; }
+  .chart-box h2 { font-size:1rem; color:#cbd5e1; margin-bottom:12px; }
+  canvas { width:100%!important; }
+  .alerts { background:#1e293b; border-radius:10px; padding:16px; border:1px solid #334155; }
+  .alerts h2 { font-size:1rem; color:#fbbf24; margin-bottom:12px; }
+  .alerts .empty { color:#64748b; font-style:italic; }
+  .alert-row { padding:6px 0; border-bottom:1px solid #334155; font-size:.82rem; }
+  .alert-row:last-child { border-bottom:none; }
+  .alert-ts { color:#94a3b8; margin-right:8px; }
+  .alert-msg { color:#fbbf24; }
+  .alert-msg.error { color:#ef4444; }
+  .refresh { color:#64748b; font-size:.75rem; margin-top:16px; text-align:center; }
 </style>
 </head>
 <body>
 <h1>Kerala CM 2026 — Poll Tracker</h1>
-<p class="sub">Last updated: {updated} &nbsp;|&nbsp; {len(rows)} data points &nbsp;|&nbsp; {len(alerts_data)} alerts</p>
+<p class="sub" id="meta">Loading...</p>
 
-<div class="grid">
-  <div class="card">
-    <div class="label">Total Votes</div>
-    <div class="value">{int(latest['total_votes']):,}</div>
-    <div class="delta">+{latest['delta_total']}/min</div>
-  </div>
-  <div class="card saffron">
-    <div class="label">K.C. Venugopal</div>
-    <div class="value">{int(latest['kc_venugopal_votes']):,}</div>
-    <div class="delta">{latest['kc_venugopal_pct']}% &nbsp; +{latest['delta_venugopal']}/min</div>
-  </div>
-  <div class="card green">
-    <div class="label">V.D. Satheesan</div>
-    <div class="value">{int(latest['vd_satheesan_votes']):,}</div>
-    <div class="delta">{latest['vd_satheesan_pct']}% &nbsp; +{latest['delta_satheesan']}/min</div>
-  </div>
-  <div class="card red">
-    <div class="label">Ramesh Chennithala</div>
-    <div class="value">{int(latest['ramesh_chennithala_votes']):,}</div>
-    <div class="delta">{latest['ramesh_chennithala_pct']}% &nbsp; +{latest['delta_chennithala']}/min</div>
+<div class="top-row">
+  <div class="grid">
+    <div class="card">
+      <div class="label">Total Votes</div>
+      <div class="value" id="total">-</div>
+      <div class="delta" id="delta-total">-</div>
+    </div>
+    <div class="card saffron">
+      <div class="label">K.C. Venugopal</div>
+      <div class="value" id="venugopal">-</div>
+      <div class="delta" id="delta-venugopal">-</div>
+    </div>
+    <div class="card green">
+      <div class="label">V.D. Satheesan</div>
+      <div class="value" id="satheesan">-</div>
+      <div class="delta" id="delta-satheesan">-</div>
+    </div>
+    <div class="card red">
+      <div class="label">Ramesh Chennithala</div>
+      <div class="value" id="chennithala">-</div>
+      <div class="delta" id="delta-chennithala">-</div>
+    </div>
   </div>
 </div>
 
-<div class="chart-box">
-  <h2>Cumulative Votes Over Time</h2>
-  <canvas id="cumChart" height="80"></canvas>
-</div>
+<section class="momentum-box">
+  <h2 class="momentum-title">Who Is Capturing New Votes?</h2>
+  <p class="momentum-callout" id="dominance-callout">Loading momentum...</p>
+
+  <div class="share-row">
+    <div class="share-head"><span>Venugopal</span><span id="share-v-label">0%</span></div>
+    <div class="share-track"><div id="share-v" class="share-fill saffron"></div></div>
+  </div>
+  <div class="share-row">
+    <div class="share-head"><span>Satheesan</span><span id="share-s-label">0%</span></div>
+    <div class="share-track"><div id="share-s" class="share-fill green"></div></div>
+  </div>
+  <div class="share-row">
+    <div class="share-head"><span>Chennithala</span><span id="share-c-label">0%</span></div>
+    <div class="share-track"><div id="share-c" class="share-fill red"></div></div>
+  </div>
+</section>
 
 <div class="chart-box">
-  <h2>Votes Per 10 Minutes (\u0394) \u2014 Spike Detection</h2>
+  <h2>Votes Per 10 Minutes (Δ) — Spike Detection</h2>
   <canvas id="deltaChart" height="200"></canvas>
 </div>
 
 <div class="alerts">
   <h2>Alerts &amp; Errors</h2>
-  {"".join(
-    f'<div class="alert-row"><span class="alert-ts">{a["ts"][5:]}</span>'
-    f'<span class="alert-msg {"error" if a["msg"].startswith("ERROR") else ""}">{a["msg"]}</span></div>'
-    for a in reversed(alerts_data[-50:])
-  ) if alerts_data else '<p class="empty">No anomalies detected yet. Monitoring...</p>'}
+  <div id="alertsContainer"><p class="empty">Loading alerts...</p></div>
 </div>
 
-<p class="refresh">Dashboard auto-regenerates every poll cycle. Refresh browser to see latest.</p>
+<p class="refresh">Updates every minute. <a href="#" onclick="location.reload();return false;" style="color:#60a5fa;">Refresh</a> for immediate reload.</p>
 
 <script>
-const labels = {json.dumps(labels)};
-const cfg = {{ responsive:true, interaction:{{mode:'index',intersect:false}}, plugins:{{legend:{{labels:{{color:'#94a3b8'}}}}}}, scales:{{x:{{ticks:{{color:'#64748b',maxTicksLimit:20}},grid:{{color:'#1e293b'}}}},y:{{ticks:{{color:'#64748b'}},grid:{{color:'#334155'}},beginAtZero:false}}}} }};
+let deltaChart;
 
-new Chart(document.getElementById('cumChart'), {{
-  type:'line',
-  data:{{
-    labels,
-    datasets:[
-      {{label:'Venugopal',data:{json.dumps(v_votes)},borderColor:'#FF9933',backgroundColor:'rgba(255,153,51,.1)',fill:false,tension:.3,pointRadius:0,borderWidth:2}},
-      {{label:'Satheesan',data:{json.dumps(s_votes)},borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',fill:false,tension:.3,pointRadius:0,borderWidth:2}},
-      {{label:'Chennithala',data:{json.dumps(c_votes)},borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.1)',fill:false,tension:.3,pointRadius:0,borderWidth:2,yAxisID:'y1'}}
-    ]
-  }},
-  options:{{...cfg, scales:{{...cfg.scales, y:{{...cfg.scales.y, position:'left', title:{{display:true,text:'Venugopal / Satheesan',color:'#94a3b8'}}}}, y1:{{position:'right', ticks:{{color:'#ef4444'}}, grid:{{drawOnChartArea:false}}, title:{{display:true,text:'Chennithala',color:'#ef4444'}}, beginAtZero:false}} }} }}
-}});
+function pctTrend(series, windowSize) {
+  if (!series || series.length < 2) return 0;
+  const slice = series.slice(-windowSize);
+  if (slice.length < 2) return 0;
+  return slice[slice.length - 1] - slice[0];
+}
 
-new Chart(document.getElementById('deltaChart'), {{
-  type:'bar',
-  data:{{
-    labels:{json.dumps(d_labels_10)},
-    datasets:[
-      {{label:'\u0394 Venugopal (10m)',data:{json.dumps(d_v_10)},backgroundColor:'rgba(255,153,51,.7)'}},
-      {{label:'\u0394 Satheesan (10m)',data:{json.dumps(d_s_10)},backgroundColor:'rgba(34,197,94,.7)'}},
-      {{label:'\u0394 Chennithala (10m)',data:{json.dumps(d_c_10)},backgroundColor:'rgba(239,68,68,.7)'}}
-    ]
-  }},
-  options:{{...cfg, plugins:{{...cfg.plugins, tooltip:{{callbacks:{{title:function(c){{return 'Time: '+c[0].label}}}}}}}}, scales:{{...cfg.scales, x:{{...cfg.scales.x}}, y:{{...cfg.scales.y, ticks:{{...cfg.scales.y.ticks, stepSize:10, autoSkip:false, font:{{size:9}}}}}}}}}}
-}});
+function avg(values) {
+  if (!values || values.length === 0) return 0;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+function trendMarkup(label, pp) {
+  if (pp > 0.05) return `<span class="pp-trend up">${label} ▲ ${pp.toFixed(2)}pp</span>`;
+  if (pp < -0.05) return `<span class="pp-trend down">${label} ▼ ${Math.abs(pp).toFixed(2)}pp</span>`;
+  return `<span class="pp-trend flat">${label} → 0.00pp</span>`;
+}
+
+async function loadData() {
+  try {
+    // Fetch and parse poll_data.csv
+    const csvResp = await fetch('poll_data.csv');
+    const csvText = await csvResp.text();
+    const rows = parseCSV(csvText);
+    const dataRows = rows.filter(r => r.total_votes); // skip error rows
+    
+    if (dataRows.length === 0) return;
+
+    // Build chart data
+    const labels = dataRows.map(r => r.timestamp.substring(5));
+    const totals = dataRows.map(r => parseInt(r.total_votes));
+    const vVotes = dataRows.map(r => parseInt(r.kc_venugopal_votes));
+    const sVotes = dataRows.map(r => parseInt(r.vd_satheesan_votes));
+    const cVotes = dataRows.map(r => parseInt(r.ramesh_chennithala_votes));
+    const pV = dataRows.map(r => parseFloat(r.kc_venugopal_pct));
+    const pS = dataRows.map(r => parseFloat(r.vd_satheesan_pct));
+    const pC = dataRows.map(r => parseFloat(r.ramesh_chennithala_pct));
+    const dV = dataRows.map(r => parseInt(r.delta_venugopal));
+    const dS = dataRows.map(r => parseInt(r.delta_satheesan));
+    const dC = dataRows.map(r => parseInt(r.delta_chennithala));
+    
+    // 10-minute buckets
+    const BUCKET = 10;
+    const d10Labels = [], dV10 = [], dS10 = [], dC10 = [];
+    for (let i = 0; i < dataRows.length; i += BUCKET) {
+      const chunk = dataRows.slice(i, i + BUCKET);
+      d10Labels.push(chunk[chunk.length-1].timestamp.substring(5));
+      dV10.push(chunk.reduce((sum, r) => sum + parseInt(r.delta_venugopal), 0));
+      dS10.push(chunk.reduce((sum, r) => sum + parseInt(r.delta_satheesan), 0));
+      dC10.push(chunk.reduce((sum, r) => sum + parseInt(r.delta_chennithala), 0));
+    }
+
+    // Load alerts
+    const alertResp = await fetch('alerts.csv');
+    const alertText = await alertResp.text();
+    const alertRows = parseCSV(alertText);
+    
+    // Update summary
+    const latest = dataRows[dataRows.length - 1];
+    document.getElementById('meta').textContent = 
+      `Last updated: ${latest.timestamp} · ${dataRows.length} data points · ${alertRows.length} alerts`;
+    
+    document.getElementById('total').textContent = parseInt(latest.total_votes).toLocaleString();
+    const dTotal = dataRows.map(r => parseInt(r.delta_total));
+    const recentTotalAvg = avg(dTotal.slice(-20));
+    const overallTotalAvg = avg(dTotal.slice(1));
+    document.getElementById('delta-total').textContent =
+      `20m avg +${recentTotalAvg.toFixed(1)}/min · overall avg +${overallTotalAvg.toFixed(1)}/min`;
+    
+    document.getElementById('venugopal').textContent = parseInt(latest.kc_venugopal_votes).toLocaleString();
+    const vRecentPp = pctTrend(pV, 20);
+    const vOverallPp = pctTrend(pV, pV.length);
+    const vRecentAvg = avg(dV.slice(-20));
+    document.getElementById('delta-venugopal').textContent =
+      `${latest.kc_venugopal_pct}% · 20m avg +${vRecentAvg.toFixed(1)}/min`;
+    document.getElementById('delta-venugopal').innerHTML +=
+      ` · ${trendMarkup('20m', vRecentPp)} · ${trendMarkup('overall', vOverallPp)}`;
+    
+    document.getElementById('satheesan').textContent = parseInt(latest.vd_satheesan_votes).toLocaleString();
+    const sRecentPp = pctTrend(pS, 20);
+    const sOverallPp = pctTrend(pS, pS.length);
+    const sRecentAvg = avg(dS.slice(-20));
+    document.getElementById('delta-satheesan').textContent =
+      `${latest.vd_satheesan_pct}% · 20m avg +${sRecentAvg.toFixed(1)}/min`;
+    document.getElementById('delta-satheesan').innerHTML +=
+      ` · ${trendMarkup('20m', sRecentPp)} · ${trendMarkup('overall', sOverallPp)}`;
+    
+    document.getElementById('chennithala').textContent = parseInt(latest.ramesh_chennithala_votes).toLocaleString();
+    const cRecentPp = pctTrend(pC, 20);
+    const cOverallPp = pctTrend(pC, pC.length);
+    const cRecentAvg = avg(dC.slice(-20));
+    document.getElementById('delta-chennithala').textContent =
+      `${latest.ramesh_chennithala_pct}% · 20m avg +${cRecentAvg.toFixed(1)}/min`;
+    document.getElementById('delta-chennithala').innerHTML +=
+      ` · ${trendMarkup('20m', cRecentPp)} · ${trendMarkup('overall', cOverallPp)}`;
+
+    // Clear point-of-comparison: who captured recent new votes
+    const shareWindow = 20;
+    const recentV = dV.slice(-shareWindow).reduce((a, b) => a + Math.max(0, b), 0);
+    const recentS = dS.slice(-shareWindow).reduce((a, b) => a + Math.max(0, b), 0);
+    const recentC = dC.slice(-shareWindow).reduce((a, b) => a + Math.max(0, b), 0);
+    const recentTotal = Math.max(1, recentV + recentS + recentC);
+    const shareV = (recentV / recentTotal) * 100;
+    const shareS = (recentS / recentTotal) * 100;
+    const shareC = (recentC / recentTotal) * 100;
+
+    document.getElementById('share-v').style.width = `${shareV.toFixed(1)}%`;
+    document.getElementById('share-s').style.width = `${shareS.toFixed(1)}%`;
+    document.getElementById('share-c').style.width = `${shareC.toFixed(1)}%`;
+    document.getElementById('share-v-label').textContent = `${shareV.toFixed(1)}%`;
+    document.getElementById('share-s-label').textContent = `${shareS.toFixed(1)}%`;
+    document.getElementById('share-c-label').textContent = `${shareC.toFixed(1)}%`;
+
+    const leaders = [
+      {name:'Venugopal', share:shareV},
+      {name:'Satheesan', share:shareS},
+      {name:'Chennithala', share:shareC},
+    ].sort((a, b) => b.share - a.share);
+    document.getElementById('dominance-callout').textContent =
+      `${leaders[0].name} captured ${leaders[0].share.toFixed(1)}% of all new votes in the last ${shareWindow} minutes.`;
+
+    // Update alerts
+    const alertsDiv = document.getElementById('alertsContainer');
+    if (alertRows.length > 0) {
+      alertsDiv.innerHTML = alertRows.slice(-50).reverse()
+        .map(a => `<div class="alert-row"><span class="alert-ts">${a.timestamp.substring(5)}</span><span class="alert-msg ${a.alert.startsWith('ERROR') ? 'error' : ''}">${a.alert}</span></div>`)
+        .join('');
+    } else {
+      alertsDiv.innerHTML = '<p class="empty">No anomalies detected yet. Monitoring...</p>';
+    }
+
+    // Chart config
+    const cfg = {
+      responsive: true, interaction: {mode:'index',intersect:false},
+      plugins: {legend: {labels: {color:'#94a3b8'}}},
+      scales: {
+        x: {ticks:{color:'#64748b',maxTicksLimit:20}, grid:{color:'#1e293b'}},
+        y: {ticks:{color:'#64748b'}, grid:{color:'#334155'}, beginAtZero:false}
+      }
+    };
+
+    // Destroy old chart
+    if (deltaChart) deltaChart.destroy();
+
+    // Delta chart
+    deltaChart = new Chart(document.getElementById('deltaChart'), {
+      type: 'bar',
+      data: {
+        labels: d10Labels,
+        datasets: [
+          {label:'Δ Venugopal (10m)', data:dV10, backgroundColor:'rgba(255,153,51,.7)'},
+          {label:'Δ Satheesan (10m)', data:dS10, backgroundColor:'rgba(34,197,94,.7)'},
+          {label:'Δ Chennithala (10m)', data:dC10, backgroundColor:'rgba(239,68,68,.7)'}
+        ]
+      },
+      options: {...cfg, plugins: {...cfg.plugins, tooltip:{callbacks:{title:c => 'Time: '+c[0].label}}}, scales: {...cfg.scales, x:{...cfg.scales.x}, y:{...cfg.scales.y, ticks:{...cfg.scales.y.ticks, stepSize:10, autoSkip:false, font:{size:9}}}}}
+    });
+
+  } catch (err) {
+    console.error('Error loading data:', err);
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\\n');
+  if (lines.length === 0) return [];
+  
+  const header = lines[0].split(',');
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',');
+    const row = {};
+    for (let j = 0; j < header.length; j++) {
+      row[header[j]] = values[j] || '';
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+// Load on startup and refresh every 1 minute (60000ms)
+loadData();
+setInterval(loadData, 60000);
 </script>
 </body>
 </html>"""
