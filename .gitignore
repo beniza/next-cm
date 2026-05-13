@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+poll_data.csv
+alerts.csv
+dashboard.html
