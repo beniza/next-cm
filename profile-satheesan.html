@@ -310,9 +310,8 @@
 <script>
   const PROFILE_KEY = "satheesan";
 
-  function trackingNarrative(stats, analytics) {
-    const largestSpike = analytics.topSpikes[0];
-    return `The tracked window opened with Satheesan on ${CMTracker.formatPercent(stats.startingShare)} and ${CMTracker.formatNumber(stats.startingVotes)} votes. He closed the final valid row on ${CMTracker.formatPercent(stats.currentShare)} and ${CMTracker.formatNumber(stats.currentVotes)} votes, after adding ${CMTracker.formatNumber(stats.addedVotes)} votes. That amounted to ${CMTracker.formatPercent(stats.captureShare)} of all newly observed votes. Even after allowing for gaps and spike-heavy periods, the captured window tilted clearly in his favour, and the biggest recorded burst at ${largestSpike.timestamp} also landed overwhelmingly on his side.`;
+  function trackingNarrative(stats) {
+    return `The tracked window opened with Satheesan on ${CMTracker.formatPercent(stats.startingShare)} and ${CMTracker.formatNumber(stats.startingVotes)} votes. He closed the final valid row on ${CMTracker.formatPercent(stats.currentShare)} and ${CMTracker.formatNumber(stats.currentVotes)} votes, after adding ${CMTracker.formatNumber(stats.addedVotes)} votes. That amounted to ${CMTracker.formatPercent(stats.captureShare)} of all newly observed votes. Across the captured window, not just in one moment, the record tilted clearly in his favour and left him with the strongest mandate-style argument in the field.`;
   }
 
   function renderSwot(candidate) {
@@ -402,7 +401,7 @@
         <div class="stat"><span class="label">Votes Added In Window</span><div class="value">${CMTracker.formatNumber(stats.addedVotes)}</div></div>
         <div class="stat"><span class="label">Share Of New Votes</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>`;
 
-      document.getElementById("tracking-reading").textContent = trackingNarrative(stats, analytics);
+      document.getElementById("tracking-reading").textContent = trackingNarrative(stats);
       document.getElementById("signals-list").innerHTML = candidate.signals.map((item) => `<li>${item}</li>`).join("");
       renderSwot(candidate);
       renderResearch(candidate);

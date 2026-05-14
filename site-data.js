@@ -108,7 +108,7 @@
       positioning: "Tracked-window frontrunner",
       descriptor: "Tracker leader and mass-facing legislative option.",
       scores: { favoring: 86, against: 29, improvement: 54 },
-      suggestion: "Convert observed momentum into a broad legitimacy case while avoiding overclaiming from spike-heavy intervals.",
+      suggestion: "Convert observed momentum into a broad legitimacy case by tying it to governance readiness, constituency credibility and a broader team story.",
       research: [
         "V.D. Satheesan represented Paravur from 2001 and served as Kerala's Leader of the Opposition from 2021 to 2026.[2]",
         "His legislative profile gives him the clearest public-facing continuity argument after the UDF win.[2][4]"
@@ -170,7 +170,7 @@
           "Combines a legislative leadership profile with a clear momentum story from the observed data."
         ],
         weaknesses: [
-          "Several of the biggest gains arrived in spike intervals, which requires careful caveating.",
+          "His strongest public asset is political sharpness, so rivals will keep testing whether that sharpness also translates into governance readiness.",
           "Front-runner status attracts the strongest scrutiny from rivals and from the party high command."
         ],
         opportunities: [
@@ -178,12 +178,12 @@
           "A Satheesan choice would be easy to frame as mandate alignment after the UDF victory."
         ],
         threats: [
-          "If spike-heavy periods dominate the public conversation, critics may question how much of the lead was organic.",
+          "If critics succeed in framing him as stronger at opposition politics than at constituency delivery or executive judgment, the lead story becomes harder to defend.",
           "Any signs of overconfidence could complicate post-selection faction management."
         ]
       },
       signals: [
-        "The data case is strongest when framed around the whole tracked window, not just isolated spikes.",
+        "The data case is strongest when linked to a broader argument about governance readiness and constituency credibility.",
         "His challenge is no longer visibility; it is building an inclusion-first team narrative.",
         "If he is chosen, the operational question becomes integration rather than justification."
       ]
