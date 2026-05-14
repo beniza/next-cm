@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What The CM Choice Means For INC</title>
+<script src="site-data.js"></script>
+<style>
+  :root {
+    --bg: #f8f4ea;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --paper: #fffaf1;
+    --line: #d8ccb2;
+    --accent: #9a3412;
+    --green: #0f766e;
+    --saffron: #c2410c;
+    --blue: #1d4ed8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(194, 65, 12, 0.14), transparent 28%),
+      radial-gradient(circle at 85% 22%, rgba(29, 78, 216, 0.14), transparent 25%),
+      radial-gradient(circle at 75% 88%, rgba(15, 118, 110, 0.12), transparent 25%),
+      linear-gradient(130deg, #faf5ea 0%, #f2ead8 55%, #fcf8ef 100%);
+  }
+
+  .shell {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .hero,
+  .panel,
+  .scenario-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 24px rgba(31, 41, 55, 0.1);
+  }
+
+  .hero {
+    border-radius: 20px;
+    padding: 26px;
+    margin-bottom: 18px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #f59e0b;
+    border-radius: 999px;
+    background: #fffbeb;
+    padding: 4px 10px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    color: #7c2d12;
+    margin-bottom: 8px;
+  }
+
+  .hero p {
+    color: #4b5563;
+    line-height: 1.65;
+    max-width: 760px;
+  }
+
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .hero-links a {
+    text-decoration: none;
+    color: #7c2d12;
+    border: 1px solid #d97706;
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: #fffbeb;
+    font-size: 0.88rem;
+  }
+
+  .stat-row,
+  .scenario-grid,
+  .card-grid,
+  .research-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .stat-row {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    margin: 18px 0;
+  }
+
+  .stat {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .stat .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .stat .value {
+    font-size: 1.08rem;
+    font-weight: 700;
+  }
+
+  .panel {
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    color: #7c2d12;
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+  }
+
+  .section-lead {
+    color: #4b5563;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .scenario-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .scenario-card {
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .scenario-head {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .scenario-head img {
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: #f3f4f6;
+    border: 1px solid var(--line);
+  }
+
+  .scenario-head h3 {
+    font-size: 1.05rem;
+    margin-bottom: 3px;
+  }
+
+  .scenario-head p,
+  .scenario-card p,
+  .card-grid p,
+  .research-grid p {
+    color: #4b5563;
+    line-height: 1.55;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .mini-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mini-metric {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+  }
+
+  .mini-metric .label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .mini-metric .value {
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .split-points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+
+  .point {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .point strong {
+    color: #7c2d12;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .card-grid article,
+  .research-grid article {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .research-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  ol {
+    padding-left: 18px;
+    color: #374151;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  .sources li {
+    margin-bottom: 10px;
+  }
+
+  .sources a {
+    color: #7c2d12;
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 16px; }
+    .scenario-head { grid-template-columns: 1fr; }
+    .scenario-head img { width: 96px; height: 96px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <span class="eyebrow">Scenario Analysis</span>
+    <h1>What The CM Choice Means For INC</h1>
+    <p>The Kerala chief minister decision is not only about who tops the internal field. It also signals how the Indian National Congress wants to balance legislative mandate, organisational control, generational messaging and coalition management after a major state victory. This page stays neutral: it maps the likely opportunities and challenges for the party under each scenario.</p>
+    <div class="hero-links">
+      <a href="index.html">Back to Candidate Intelligence Hub</a>
+      <a href="dashboard.html">Open Legacy Tracker</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="label">INC Lok Sabha Tally</div>
+        <div class="value">99 seats in 2024 [7]</div>
+      </div>
+      <div class="stat">
+        <div class="label">State Government Context</div>
+        <div class="value">Himachal 2022, Karnataka 2023, Telangana 2023, Kerala 2026 [4][5][6][7]</div>
+      </div>
+      <div class="stat">
+        <div class="label">Kerala Tracked Additions</div>
+        <div class="value" id="tracked-additions">Loading...</div>
+      </div>
+      <div class="stat">
+        <div class="label">Reading Rule</div>
+        <div class="value">Tracker first, caveats always</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Scenario Lens</h2>
+    <p class="section-lead">Each choice solves a different INC problem. Satheesan aligns most closely with the tracked-window mandate signal. Venugopal strengthens organisation-first coordination with the national leadership. Chennithala offers the most veteran consensus frame, but the weakest tracker case.</p>
+    <div class="scenario-grid" id="scenario-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Opportunities</h2>
+    <div class="card-grid">
+      <article>
+        <strong>Southern consolidation</strong>
+        <p>A clean Kerala transition would add to the party's recent wins in Karnataka and Telangana, helping INC argue that it can still govern large southern states with credibility.[5][6][7]</p>
+      </article>
+      <article>
+        <strong>Mandate conversion</strong>
+        <p>The Kerala outcome gives INC a chance to show that it can turn a legislative victory into a disciplined leadership settlement instead of a prolonged internal contest.</p>
+      </article>
+      <article>
+        <strong>Message to cadre</strong>
+        <p>The final choice will tell workers whether the party is rewarding visible public momentum, organisational depth, or senior reconciliation. That message travels beyond Kerala.</p>
+      </article>
+      <article>
+        <strong>National narrative</strong>
+        <p>After improving to 99 Lok Sabha seats in 2024, INC can use Kerala to reinforce its argument that it remains a viable governing force rather than only an opposition platform.[7]</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Challenges</h2>
+    <div class="card-grid">
+      <article>
+        <strong>High-command optics</strong>
+        <p>If the choice looks opaque or slow, critics will frame it as another example of a state mandate being filtered through central calculations rather than resolved locally.</p>
+      </article>
+      <article>
+        <strong>Tracker mismatch debate</strong>
+        <p>The public conversation will compare the final selection against tracked-window signals, but the dataset also contains gaps, spikes and a timeout row. INC needs a disciplined explanation either way.</p>
+      </article>
+      <article>
+        <strong>Factional integration</strong>
+        <p>The winner is only half the story. Congress has faced defections and internal strain in recent years, so Kerala's post-selection team design matters almost as much as the headline name.[7]</p>
+      </article>
+      <article>
+        <strong>Narrative consistency</strong>
+        <p>If the party chooses the tracker frontrunner, it must still reassure non-winning factions. If it chooses someone else, it must explain why organisational or consensus logic outweighed the live data story.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Operational Read-Through</h2>
+    <div class="split-points">
+      <div class="point">
+        <strong>If INC chooses Satheesan</strong>
+        That would read as the cleanest mandate-alignment decision because his public role and tracked-window performance point in the same direction.
+      </div>
+      <div class="point">
+        <strong>If INC chooses Venugopal</strong>
+        The party would be signalling that national-state coordination, organisational control and central confidence matter at least as much as observed tracker momentum.
+      </div>
+      <div class="point">
+        <strong>If INC chooses Chennithala</strong>
+        The message would tilt strongly toward experience and reconciliation, but the party would need the most elaborate explanation to bridge the gap with the live tracker story.
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Research Context</h2>
+    <div class="research-grid">
+      <article>
+        <strong>Candidate roles</strong>
+        <p>Venugopal is an AICC organisation leader and MP; Satheesan carried the Opposition leadership in Kerala before the 2026 win; Chennithala brings senior CWC, KPCC and ministerial experience.[1][2][3]</p>
+      </article>
+      <article>
+        <strong>INC baseline</strong>
+        <p>The party remains a national force with a broad state footprint and improved parliamentary position after the 2024 Lok Sabha election, but it still operates under close scrutiny on internal cohesion and leadership culture.[7]</p>
+      </article>
+      <article>
+        <strong>Why Kerala matters</strong>
+        <p>Kerala adds to a sequence of recent state wins and therefore becomes a test case for how INC handles success, not only how it handles opposition politics.[4][5][6][7]</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel sources">
+    <h2>Sources</h2>
+    <ol>
+      <li><a href="https://en.wikipedia.org/wiki/K._C._Venugopal" target="_blank" rel="noreferrer">K.C. Venugopal</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/V._D._Satheesan" target="_blank" rel="noreferrer">V.D. Satheesan</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Ramesh_Chennithala" target="_blank" rel="noreferrer">Ramesh Chennithala</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2022_Himachal_Pradesh_Legislative_Assembly_election" target="_blank" rel="noreferrer">2022 Himachal Pradesh Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Karnataka_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Karnataka Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Telangana_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Telangana Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Indian_National_Congress" target="_blank" rel="noreferrer">Indian National Congress</a></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+  function renderScenarioCards(analytics) {
+    const container = document.getElementById("scenario-grid");
+    container.innerHTML = CMTracker.ORDER.map((candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      const stats = CMTracker.getCandidateAnalytics(analytics, candidateId);
+
+      let scenarioSummary = "";
+      let opportunity = "";
+      let challenge = "";
+
+      if (candidateId === "satheesan") {
+        scenarioSummary = "The clearest mandate-alignment scenario, because the observed tracker and public leadership profile reinforce one another.";
+        opportunity = "Lets INC claim that it respected both the electoral mood and the tracked-window evidence.";
+        challenge = "Requires careful integration of non-winning factions so a data-led choice does not become a winner-take-all story.";
+      } else if (candidateId === "venugopal") {
+        scenarioSummary = "The strongest organisation-first scenario, where INC privileges coordination with the national structure over the live tracker narrative.";
+        opportunity = "Could produce tighter AICC-state alignment and smoother administrative coordination from day one.";
+        challenge = "Needs a clearer explanation because the tracked window did not show matching live momentum.";
+      } else {
+        scenarioSummary = "The clearest veteran-consensus scenario, built on seniority, experience and internal balance rather than observed vote flow.";
+        opportunity = "Could be framed as a reconciliation move if INC wants the most experienced stabiliser at the top.";
+        challenge = "This is the hardest choice to justify through tracker evidence alone because Chennithala remained a distant third in the observed window.";
+      }
+
+      return `
+        <article class="scenario-card">
+          <div class="scenario-head">
+            <img id="scenario-image-${candidateId}" src="https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.short)}&background=f3f4f6&color=111827&size=220" alt="${candidate.name}">
+            <div>
+              <span class="tag">Scenario lens</span>
+              <h3>${candidate.name}</h3>
+              <p>${candidate.role}</p>
+            </div>
+          </div>
+          <p>${scenarioSummary}</p>
+          <div class="mini-metrics">
+            <div class="mini-metric">
+              <div class="label">Latest Share</div>
+              <div class="value">${CMTracker.formatPercent(stats.currentShare)}</div>
+            </div>
+            <div class="mini-metric">
+              <div class="label">Window Share</div>
+              <div class="value">${CMTracker.formatPercent(stats.captureShare)}</div>
+            </div>
+            <div class="mini-metric">
+              <div class="label">Votes Added</div>
+              <div class="value">${CMTracker.formatNumber(stats.addedVotes)}</div>
+            </div>
+            <div class="mini-metric">
+              <div class="label">Scenario Odds</div>
+              <div class="value">${CMTracker.formatPercent(stats.odds)}</div>
+            </div>
+          </div>
+          <p><strong>Opportunity:</strong> ${opportunity}</p>
+          <p><strong>Challenge:</strong> ${challenge}</p>
+        </article>`;
+    }).join("");
+  }
+
+  async function attachImages() {
+    await Promise.all(CMTracker.ORDER.map(async (candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
+      const target = document.getElementById(`scenario-image-${candidateId}`);
+      if (target && image) {
+        target.src = image;
+      }
+    }));
+  }
+
+  async function init() {
+    try {
+      const dataset = await CMTracker.loadDataset();
+      const analytics = CMTracker.computeAnalytics(dataset);
+      document.getElementById("tracked-additions").textContent = `${CMTracker.formatNumber(analytics.captured.total)} votes in the captured window`;
+      renderScenarioCards(analytics);
+      attachImages();
+    } catch (error) {
+      document.getElementById("tracked-additions").textContent = "Unable to load tracked data";
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

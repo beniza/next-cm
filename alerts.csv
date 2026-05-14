@@ -3,3 +3,4 @@ timestamp,alert
 2026-05-13 12:54:30,"SPIKE Satheesan: +1301 votes/min (avg 62, std 5, threshold 78)"
 2026-05-13 16:15:04,"SPIKE Satheesan: +270 votes/min (avg 42, std 16, threshold 89)"
 2026-05-13 21:42:59,"SPIKE Satheesan: +461 votes/min (avg 12, std 3, threshold 22)"
+2026-05-14 04:27:27,ERROR: <urlopen error timed out>

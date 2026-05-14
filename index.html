@@ -1,597 +1,1127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poll Data Analysis — Deep Dive</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #0f1117;
-            color: #e2e8f0;
-            padding: 20px;
-            line-height: 1.6;
-        }
-        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #f8fafc; }
-        h2 { font-size: 1.3rem; margin: 30px 0 12px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
-        h3 { font-size: 1rem; color: #64748b; margin-bottom: 8px; }
-        .subtitle { color: #64748b; margin-bottom: 24px; font-size: 0.9rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #334155;
-        }
-        .card-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
-        .card-detail { font-size: 0.8rem; color: #94a3b8; }
-        .venugopal { color: #f97316; }
-        .satheesan { color: #3b82f6; }
-        .chennithala { color: #10b981; }
-        .chart-container {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #334155;
-            margin-bottom: 24px;
-            position: relative;
-        }
-        .chart-container canvas { max-height: 400px; }
-        .insight-box {
-            background: #1e293b;
-            border-left: 4px solid #3b82f6;
-            border-radius: 0 12px 12px 0;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-        }
-        .insight-box.warning { border-left-color: #f59e0b; }
-        .insight-box.critical { border-left-color: #ef4444; }
-        .insight-box strong { color: #f8fafc; }
-        .controls {
-            display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;
-        }
-        .controls button {
-            background: #334155; color: #e2e8f0; border: 1px solid #475569;
-            padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
-        }
-        .controls button:hover { background: #475569; }
-        .controls button.active { background: #3b82f6; border-color: #3b82f6; }
-        .play-btn { font-size: 1.2rem !important; padding: 6px 18px !important; }
-        .slider-container { flex: 1; min-width: 200px; }
-        .slider-container input[type=range] { width: 100%; accent-color: #3b82f6; }
-        .timestamp-display { font-family: monospace; font-size: 0.85rem; color: #94a3b8; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #334155; }
-        th { color: #64748b; font-weight: 600; }
-        .hypothesis {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        .hypothesis h4 { color: #f8fafc; margin-bottom: 8px; }
-        .hypothesis p { color: #94a3b8; font-size: 0.9rem; }
-        .tag { display: inline-block; background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-right: 4px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kerala CM 2026 | Candidate Intelligence Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="site-data.js"></script>
+<style>
+  :root {
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --paper: #fffaf0;
+    --line: #d6c7a8;
+    --accent: #9a3412;
+    --soft: #fdf8ee;
+    --v-color: #c2410c;
+    --s-color: #2563eb;
+    --c-color: #047857;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100vh;
+    padding: 24px;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 80% 15%, rgba(194, 65, 12, 0.16), transparent 28%),
+      radial-gradient(circle at 15% 85%, rgba(37, 99, 235, 0.16), transparent 30%),
+      linear-gradient(120deg, #f6f1e7 0%, #efe6d6 50%, #f9f3e8 100%);
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .hero,
+  .panel,
+  .candidate-card,
+  .summary-card,
+  .finding,
+  .suggestion,
+  .chart-card,
+  .odds-row,
+  .source-card,
+  .method-card,
+  .note-box {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 24px rgba(31, 41, 55, 0.09);
+  }
+
+  .hero {
+    border-radius: 20px;
+    padding: 26px;
+    margin-bottom: 18px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+    border-radius: 999px;
+    padding: 4px 10px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.5rem);
+    color: #7c2d12;
+    margin-bottom: 8px;
+  }
+
+  .sub,
+  .section-lead,
+  .source-card p,
+  .suggestion,
+  .note-box,
+  .method-card,
+  .finding,
+  .hero-note {
+    color: #4b5563;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .hero-actions a,
+  .card-link,
+  .panel-link {
+    text-decoration: none;
+    color: #7c2d12;
+    border: 1px solid #d97706;
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: #fffbeb;
+    font-size: 0.86rem;
+  }
+
+  .status-row,
+  .candidate-grid,
+  .summary-grid,
+  .findings-grid,
+  .chart-grid,
+  .sources-grid,
+  .method-grid,
+  .comparison-layout {
+    display: grid;
+    gap: 14px;
+  }
+
+  .status-row,
+  .summary-grid,
+  .method-grid {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    margin-top: 18px;
+  }
+
+  .candidate-grid {
+    grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+    margin-bottom: 18px;
+  }
+
+  .candidate-card {
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .candidate-head {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .candidate-head img {
+    width: 76px;
+    height: 76px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: #f3f4f6;
+    border: 1px solid var(--line);
+  }
+
+  .candidate-name {
+    font-size: 1.08rem;
+    margin-bottom: 2px;
+  }
+
+  .candidate-role,
+  .candidate-positioning,
+  .metric .k,
+  .summary-card .k,
+  .method-card .k,
+  .stat-label,
+  .odds-head,
+  .table-note,
+  th,
+  .sources-list,
+  .comparison-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+
+  .candidate-positioning {
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .candidate-summary {
+    color: #374151;
+    line-height: 1.55;
+    font-size: 0.92rem;
+  }
+
+  .candidate-metrics,
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .metric,
+  .summary-card,
+  .method-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .metric .k,
+  .summary-card .k,
+  .method-card .k {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .metric .v,
+  .summary-card .v {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .share-note {
+    background: #fffdf5;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+    color: #4b5563;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.74rem;
+  }
+
+  .chip.v { background: var(--v-color); }
+  .chip.s { background: var(--s-color); }
+  .chip.c { background: var(--c-color); }
+
+  .panel {
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    color: #7c2d12;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .comparison-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .suggestions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .suggestion {
+    border-radius: 12px;
+    padding: 12px;
+    border-left: 4px solid #d97706;
+    background: #fff;
+  }
+
+  .suggestion strong,
+  .finding strong,
+  .note-box strong,
+  .source-card strong {
+    color: #7c2d12;
+  }
+
+  .comparison-note {
+    margin-top: 10px;
+    line-height: 1.55;
+  }
+
+  .legend-inline {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  .odds-section {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .odds-row {
+    border-radius: 12px;
+    padding: 10px;
+    background: #fff;
+  }
+
+  .odds-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .track {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .findings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .finding {
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+  }
+
+  .chart-grid.two-up {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+
+  .chart-card {
+    border-radius: 16px;
+    padding: 16px;
+    background: var(--soft);
+  }
+
+  .chart-card canvas {
+    width: 100% !important;
+    max-height: 340px;
+  }
+
+  .note-box {
+    border-radius: 14px;
+    padding: 14px;
+    margin-top: 14px;
+    background: #fffef8;
+  }
+
+  .note-box ul,
+  .sources-list,
+  .table-wrap table {
+    color: #374151;
+  }
+
+  .note-box ul,
+  .sources-list {
+    padding-left: 18px;
+  }
+
+  .note-box li,
+  .sources-list li {
+    margin-bottom: 7px;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .play-btn {
+    background: #7c2d12;
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+
+  .slider-wrap {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .slider-wrap input[type=range] {
+    width: 100%;
+    accent-color: #7c2d12;
+  }
+
+  .timestamp {
+    font-family: Consolas, monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eadfcb;
+  }
+
+  th {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.72rem;
+    background: #fff8ea;
+  }
+
+  .sources-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    margin-bottom: 12px;
+  }
+
+  .source-card {
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+  }
+
+  .sources-list a,
+  .legacy-note a {
+    color: #7c2d12;
+  }
+
+  .legacy-note {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 920px) {
+    .comparison-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 16px; }
+    .candidate-head { grid-template-columns: 1fr; }
+    .candidate-head img { width: 96px; height: 96px; }
+  }
+</style>
 </head>
 <body>
-    <h1>Poll Data — Deep Analysis</h1>
-    <p class="subtitle">KC Venugopal vs VD Satheesan vs Ramesh Chennithala | Tracking: May 13, 07:14 — May 14, 03:49</p>
-
-    <h2>📊 Overall Status (Including Initial Data)</h2>
-    <div class="grid" id="summary-cards"></div>
-    <div class="chart-container">
-        <h3>Overall Vote Share — Absolute Numbers</h3>
-        <canvas id="chart-overall-pie"></canvas>
+<div class="shell">
+  <section class="hero">
+    <span class="eyebrow">Primary Election Briefing</span>
+    <h1>Kerala CM 2026 Candidate Intelligence Hub</h1>
+    <p class="sub">The primary narrative on this page is based on the full tracked window in poll_data.csv, not on a weak last-20-minute slice. Final totals are shown separately because the first valid snapshot already contained a large vote base, and the dataset includes long gaps, spike flags and one timeout row.</p>
+    <div class="hero-actions">
+      <a href="inc-impact.html">What the CM choice means for INC</a>
+      <a href="dashboard.html">Open legacy tracker</a>
     </div>
-
-    <h2>📈 Votes Captured During Tracking Sessions</h2>
-    <div class="grid" id="delta-cards"></div>
-    <div class="chart-container">
-        <h3>New Votes Distribution (Only During Capture)</h3>
-        <canvas id="chart-delta-pie"></canvas>
+    <div class="status-row">
+      <div class="summary-card">
+        <span class="k">Tracked Window</span>
+        <div class="v" id="window-range">Loading...</div>
+      </div>
+      <div class="summary-card">
+        <span class="k">Votes Directly Observed</span>
+        <div class="v" id="window-votes">-</div>
+      </div>
+      <div class="summary-card">
+        <span class="k">Final Total On Source</span>
+        <div class="v" id="final-total">-</div>
+      </div>
+      <div class="summary-card">
+        <span class="k">Gaps And Errors</span>
+        <div class="v" id="gap-summary">-</div>
+      </div>
     </div>
+  </section>
 
-    <h2>⚡ Voting Rate Over Time (Votes/Minute)</h2>
-    <div class="chart-container">
-        <h3>Per-Minute Vote Rate by Candidate (5-min moving average)</h3>
-        <canvas id="chart-rate"></canvas>
-    </div>
+  <section class="candidate-grid" id="candidate-grid"></section>
 
-    <h2>📉 Total Votes Over Time — Cumulative Growth</h2>
-    <div class="chart-container">
-        <h3>Cumulative vote totals with session gaps marked</h3>
-        <canvas id="chart-cumulative"></canvas>
-    </div>
+  <section class="panel">
+    <h2>Methodology & Caveats</h2>
+    <p class="section-lead">This page treats the tracked window as the primary evidence base. That means the strongest conclusions come from what changed between the first and last valid snapshots, while anything about the difference between tracked flow and full source totals remains a cautious interpretation rather than a certainty.</p>
+    <div class="method-grid" id="method-grid"></div>
+    <div class="note-box" id="method-note"></div>
+  </section>
 
-    <h2>🔄 Vote Share Shift Over Time</h2>
-    <div class="chart-container">
-        <h3>Percentage share evolution during tracking</h3>
-        <canvas id="chart-pct"></canvas>
-    </div>
-
-    <h2>🏁 Hourly Breakdown — Votes Cast Per Hour</h2>
-    <div class="chart-container">
-        <h3>Stacked bar: new votes per hour by candidate</h3>
-        <canvas id="chart-hourly"></canvas>
-    </div>
-
-    <h2>🎬 Animated Timeline</h2>
-    <div class="chart-container">
-        <div class="controls">
-            <button class="play-btn" id="play-btn">▶</button>
-            <div class="slider-container">
-                <input type="range" id="timeline-slider" min="0" max="100" value="0">
-            </div>
-            <span class="timestamp-display" id="timestamp-display">--</span>
+  <section class="panel">
+    <h2>Comparison: Favoring Factors vs Against Factors vs Improvement Potential</h2>
+    <div class="comparison-layout">
+      <div>
+        <div class="chart-card">
+          <canvas id="comparison-chart"></canvas>
         </div>
-        <canvas id="chart-animated"></canvas>
+        <div class="legend-inline">
+          <span><span class="dot" style="background:#16a34a;"></span>Favoring</span>
+          <span><span class="dot" style="background:#dc2626;"></span>Against</span>
+          <span><span class="dot" style="background:#d97706;"></span>Improvement Potential</span>
+        </div>
+        <div class="odds-section" id="odds-section"></div>
+        <p class="comparison-note">These scorecard values synthesize tracked-window performance with public role context from the cited sources. The odds bars are a transparent heuristic: 70% latest share plus 30% tracked-window capture share.</p>
+      </div>
+      <div class="suggestions" id="suggestions-box"></div>
     </div>
+    <p class="legacy-note">dashboard.html remains in the workspace as the legacy tracker, but index.html is the primary briefing surface.</p>
+  </section>
 
-    <h2>🔍 Key Insights & Hypotheses</h2>
-    <div id="insights"></div>
-
-    <h2>📋 Hourly Statistics Table</h2>
-    <div class="card" style="overflow-x:auto;">
-        <table id="hourly-table">
-            <thead>
-                <tr>
-                    <th>Hour</th>
-                    <th>Total New</th>
-                    <th>Venugopal</th>
-                    <th>Satheesan</th>
-                    <th>Chennithala</th>
-                    <th>Satheesan %</th>
-                    <th>Avg/Min</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+  <section class="panel">
+    <h2>Tracking Window</h2>
+    <p class="section-lead">This is the main analytical lens: how much each candidate added while the tracker was actively recording valid vote totals.</p>
+    <div class="summary-grid" id="tracking-summary"></div>
+    <div class="chart-grid two-up">
+      <div class="chart-card">
+        <h3>New Votes During Tracking Window</h3>
+        <canvas id="tracking-share-chart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Voting Rate Over Time</h3>
+        <canvas id="rate-chart"></canvas>
+      </div>
     </div>
+  </section>
 
-    <script>
-    // Parse CSV data
-    const csvText = `CSVDATA`;
+  <section class="panel">
+    <h2>Final Totals Comparison</h2>
+    <p class="section-lead">The first valid snapshot already contained most of the final tally. This section shows that opening base and the additional votes observed during the tracking window.</p>
+    <div class="summary-grid" id="final-summary"></div>
+    <div class="chart-card">
+      <h3>Opening Snapshot Plus Added Votes</h3>
+      <canvas id="final-comparison-chart"></canvas>
+    </div>
+    <div class="note-box" id="possible-causes"></div>
+  </section>
 
-    let rows = [];
-    let rawData = [];
+  <section class="panel">
+    <h2>Key Findings</h2>
+    <div class="findings-grid" id="key-findings"></div>
+  </section>
 
-    fetch('poll_data.csv').then(r => r.text()).then(csv => {
-        parseAndRender(csv);
-    }).catch(() => {
-        // Fallback: try inline
-        document.body.innerHTML = '<h1 style="color:red;">Place this file in the same directory as poll_data.csv and open via a local server.</h1>';
+  <section class="panel">
+    <h2>Cumulative Growth</h2>
+    <div class="chart-card">
+      <canvas id="cumulative-chart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Vote Share Shift Over Time</h2>
+    <div class="chart-card">
+      <canvas id="share-shift-chart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Hourly Breakdown</h2>
+    <div class="chart-card">
+      <canvas id="hourly-chart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Animated Timeline</h2>
+    <div class="chart-card">
+      <div class="controls">
+        <button class="play-btn" id="play-btn" type="button">Play</button>
+        <div class="slider-wrap">
+          <input id="timeline-slider" type="range" min="0" max="0" value="0">
+        </div>
+        <span class="timestamp" id="timeline-label">Loading...</span>
+      </div>
+      <canvas id="timeline-chart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Hourly Statistics Table</h2>
+    <p class="table-note">Hourly totals include the jumps visible at the time each row was captured. Large gap-following jumps are part of the observed record, but they should not be mistaken for smooth minute-by-minute growth.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Hour</th>
+            <th>Total Added</th>
+            <th>Venugopal</th>
+            <th>Satheesan</th>
+            <th>Chennithala</th>
+            <th>Satheesan %</th>
+            <th>Avg/Row</th>
+          </tr>
+        </thead>
+        <tbody id="hourly-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Research Context</h2>
+    <div class="sources-grid">
+      <article class="source-card">
+        <strong>Candidate roles</strong>
+        <p>Venugopal is the AICC organisation general secretary and an MP.[1] Satheesan led the opposition in Kerala before the 2026 win.[2] Chennithala brings CWC, KPCC and ministerial experience.[3]</p>
+      </article>
+      <article class="source-card">
+        <strong>INC wider context</strong>
+        <p>The party won Himachal in 2022, Karnataka in 2023, Telangana in 2023, and improved to 99 Lok Sabha seats in 2024, which gives the Kerala choice importance beyond the state itself.[4][5][6][7]</p>
+      </article>
+      <article class="source-card">
+        <strong>Next question</strong>
+        <p>This homepage answers what the tracker showed. The separate <a href="inc-impact.html">INC implications page</a> explores what each selection would mean for the party's opportunities and challenges.</p>
+      </article>
+    </div>
+    <div class="note-box">
+      <strong>Neutrality rule:</strong> this site describes tracked data and publicly available context. It does not endorse any candidate.
+    </div>
+    <ol class="sources-list">
+      <li><a href="https://en.wikipedia.org/wiki/K._C._Venugopal" target="_blank" rel="noreferrer">K.C. Venugopal</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/V._D._Satheesan" target="_blank" rel="noreferrer">V.D. Satheesan</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Ramesh_Chennithala" target="_blank" rel="noreferrer">Ramesh Chennithala</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2022_Himachal_Pradesh_Legislative_Assembly_election" target="_blank" rel="noreferrer">2022 Himachal Pradesh Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Karnataka_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Karnataka Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Telangana_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Telangana Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Indian_National_Congress" target="_blank" rel="noreferrer">Indian National Congress</a></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+  let comparisonChart;
+  let trackingShareChart;
+  let finalComparisonChart;
+  let rateChart;
+  let cumulativeChart;
+  let shareShiftChart;
+  let hourlyChart;
+  let timelineChart;
+  let timelineTimer;
+
+  function createOrReplace(current, canvasId, config) {
+    if (current) {
+      current.destroy();
+    }
+    return new Chart(document.getElementById(canvasId), config);
+  }
+
+  function renderHero(analytics) {
+    const firstDate = analytics.first.timestampDate.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    const lastDate = analytics.last.timestampDate.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    document.getElementById("window-range").textContent = `${firstDate} -> ${lastDate}`;
+    document.getElementById("window-votes").textContent = CMTracker.formatNumber(analytics.captured.total);
+    document.getElementById("final-total").textContent = CMTracker.formatNumber(analytics.last.total_votes);
+    document.getElementById("gap-summary").textContent = `${analytics.gaps.length} long gaps, ${analytics.errorEvents.length} timeout`;
+  }
+
+  function renderCandidateGrid(analytics) {
+    const grid = document.getElementById("candidate-grid");
+    grid.innerHTML = CMTracker.ORDER.map((candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      const stats = CMTracker.getCandidateAnalytics(analytics, candidateId);
+      return `
+        <article class="candidate-card">
+          <div class="candidate-head">
+            <img id="candidate-image-${candidateId}" src="https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.short)}&background=f3f4f6&color=111827&size=220" alt="${candidate.name}">
+            <div>
+              <div class="candidate-name">${candidate.name}</div>
+              <div class="candidate-role">${candidate.role}</div>
+              <div class="candidate-positioning">${candidate.positioning}</div>
+            </div>
+          </div>
+          <p class="candidate-summary">${candidate.descriptor}</p>
+          <div class="candidate-metrics">
+            <div class="metric">
+              <span class="k">Votes</span>
+              <div class="v">${CMTracker.formatNumber(stats.currentVotes)}</div>
+            </div>
+            <div class="metric">
+              <span class="k">Current Share</span>
+              <div class="v">${CMTracker.formatPercent(stats.currentShare)}</div>
+            </div>
+            <div class="metric">
+              <span class="k">Window Adds</span>
+              <div class="v">${CMTracker.formatNumber(stats.addedVotes)}</div>
+            </div>
+            <div class="metric">
+              <span class="k">Window Share</span>
+              <div class="v">${CMTracker.formatPercent(stats.captureShare)}</div>
+            </div>
+          </div>
+          <div class="share-note">Share change from first snapshot: ${CMTracker.formatSigned(stats.shareChange, 1, " pts")}</div>
+          <div class="card-footer">
+            <span class="chip ${candidate.accentClass}">${candidate.short}</span>
+            <a class="card-link" href="${candidate.profilePage}">View full profile</a>
+          </div>
+        </article>`;
+    }).join("");
+  }
+
+  function renderMethodology(analytics) {
+    const longestGap = analytics.gaps.slice().sort((left, right) => right.minutes - left.minutes)[0];
+    const firstSnapshotShare = analytics.last.total_votes ? (analytics.first.total_votes / analytics.last.total_votes) * 100 : 0;
+
+    document.getElementById("method-grid").innerHTML = `
+      <div class="method-card">
+        <span class="k">Primary lens</span>
+        ${CMTracker.formatNumber(analytics.captured.total)} votes changed during the captured window.
+      </div>
+      <div class="method-card">
+        <span class="k">Opening base</span>
+        ${CMTracker.formatNumber(analytics.first.total_votes)} votes were already present at the first valid snapshot, or ${CMTracker.formatPercent(firstSnapshotShare)} of the final tally.
+      </div>
+      <div class="method-card">
+        <span class="k">Observed gaps</span>
+        ${analytics.gaps.length} gaps exceeded five minutes. The longest lasted ${longestGap ? longestGap.minutes.toFixed(1) : "0.0"} minutes.
+      </div>
+      <div class="method-card">
+        <span class="k">Alert rows</span>
+        ${analytics.spikeEvents.length} spike flags and ${analytics.errorEvents.length} timeout row were recorded inside the dataset.
+      </div>`;
+
+    document.getElementById("method-note").innerHTML = `
+      <strong>Possible causes of mismatch between tracked flow and full totals:</strong>
+      <ul>
+        <li>Most votes were already present before direct tracking began, so the dataset is not a full-origin count.</li>
+        <li>Large jumps after gaps suggest some source-side changes were surfaced in batches rather than as smooth minute-by-minute updates.</li>
+        <li>The timeout row shows at least one interval where the scraper did not capture the source in real time.</li>
+        <li>Because of those limits, this page treats mismatch explanations as possibilities, not proof of any single cause.</li>
+      </ul>`;
+  }
+
+  function renderComparison(analytics) {
+    const candidates = CMTracker.ORDER.map((candidateId) => CMTracker.CANDIDATES[candidateId]);
+
+    comparisonChart = createOrReplace(comparisonChart, "comparison-chart", {
+      type: "bar",
+      data: {
+        labels: candidates.map((candidate) => candidate.short),
+        datasets: [
+          {
+            label: "Favoring",
+            data: candidates.map((candidate) => candidate.scores.favoring),
+            backgroundColor: "rgba(22, 163, 74, 0.78)",
+            borderRadius: 8
+          },
+          {
+            label: "Against",
+            data: candidates.map((candidate) => candidate.scores.against),
+            backgroundColor: "rgba(220, 38, 38, 0.76)",
+            borderRadius: 8
+          },
+          {
+            label: "Improvement Potential",
+            data: candidates.map((candidate) => candidate.scores.improvement),
+            backgroundColor: "rgba(217, 119, 6, 0.78)",
+            borderRadius: 8
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: "#4b5563" } }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#374151" },
+            grid: { color: "rgba(203, 213, 225, 0.35)" }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            ticks: { color: "#374151" },
+            grid: { color: "rgba(203, 213, 225, 0.35)" }
+          }
+        }
+      }
     });
 
-    function parseAndRender(csv) {
-        const lines = csv.trim().split('\n');
-        const header = lines[0].split(',');
+    document.getElementById("odds-section").innerHTML = CMTracker.ORDER.map((candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      const odds = analytics.odds[candidateId];
+      return `
+        <div class="odds-row">
+          <div class="odds-head"><span>${candidate.short} heuristic odds</span><span>${CMTracker.formatPercent(odds)}</span></div>
+          <div class="track"><div class="fill" style="width:${odds.toFixed(1)}%;background:${candidate.color};"></div></div>
+        </div>`;
+    }).join("");
 
-        for (let i = 1; i < lines.length; i++) {
-            // Handle quoted fields (alert messages contain commas)
-            const parts = [];
-            let inQuote = false;
-            let current = '';
-            for (const ch of lines[i]) {
-                if (ch === '"') { inQuote = !inQuote; continue; }
-                if (ch === ',' && !inQuote) { parts.push(current); current = ''; continue; }
-                current += ch;
-            }
-            parts.push(current);
+    document.getElementById("suggestions-box").innerHTML = CMTracker.ORDER.map((candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      return `<article class="suggestion"><strong>${candidate.short}:</strong> ${candidate.suggestion}</article>`;
+    }).join("");
+  }
 
-            if (parts.length < 12) continue;
+  function renderTrackingWindow(analytics) {
+    document.getElementById("tracking-summary").innerHTML = `
+      <div class="summary-card"><span class="k">Added During Tracking</span><div class="v">${CMTracker.formatNumber(analytics.captured.total)}</div></div>
+      <div class="summary-card"><span class="k">Venugopal Added</span><div class="v">${CMTracker.formatNumber(analytics.captured.venugopal)}</div><div class="stat-label">${CMTracker.formatPercent(analytics.captureShare.venugopal)} of new votes</div></div>
+      <div class="summary-card"><span class="k">Satheesan Added</span><div class="v">${CMTracker.formatNumber(analytics.captured.satheesan)}</div><div class="stat-label">${CMTracker.formatPercent(analytics.captureShare.satheesan)} of new votes</div></div>
+      <div class="summary-card"><span class="k">Chennithala Added</span><div class="v">${CMTracker.formatNumber(analytics.captured.chennithala)}</div><div class="stat-label">${CMTracker.formatPercent(analytics.captureShare.chennithala)} of new votes</div></div>`;
 
-            rawData.push({
-                timestamp: new Date(parts[0].trim()),
-                total: +parts[1],
-                venugopal: +parts[2],
-                venugopal_pct: +parts[3],
-                satheesan: +parts[4],
-                satheesan_pct: +parts[5],
-                chennithala: +parts[6],
-                chennithala_pct: +parts[7],
-                delta_total: +parts[8],
-                delta_venugopal: +parts[9],
-                delta_satheesan: +parts[10],
-                delta_chennithala: +parts[11],
-                alert: parts[12] || ''
-            });
+    trackingShareChart = createOrReplace(trackingShareChart, "tracking-share-chart", {
+      type: "doughnut",
+      data: {
+        labels: ["Venugopal", "Satheesan", "Chennithala"],
+        datasets: [{
+          data: [analytics.captured.venugopal, analytics.captured.satheesan, analytics.captured.chennithala],
+          backgroundColor: ["#c2410c", "#2563eb", "#047857"],
+          borderColor: "#fffaf0",
+          borderWidth: 4
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#4b5563" } }
         }
+      }
+    });
 
-        renderAll();
+    rateChart = createOrReplace(rateChart, "rate-chart", {
+      type: "line",
+      data: {
+        labels: analytics.rateSeries.labels.map((date) => date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
+        datasets: [
+          { label: "Satheesan", data: analytics.rateSeries.series.satheesan, borderColor: "#2563eb", backgroundColor: "rgba(37, 99, 235, 0.12)", fill: true, tension: 0.28, pointRadius: 0 },
+          { label: "Venugopal", data: analytics.rateSeries.series.venugopal, borderColor: "#c2410c", backgroundColor: "rgba(194, 65, 12, 0.12)", fill: true, tension: 0.28, pointRadius: 0 },
+          { label: "Chennithala", data: analytics.rateSeries.series.chennithala, borderColor: "#047857", backgroundColor: "rgba(4, 120, 87, 0.12)", fill: true, tension: 0.28, pointRadius: 0 }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: "#4b5563" } } },
+        scales: {
+          x: { ticks: { color: "#6b7280", maxTicksLimit: 16 }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { ticks: { color: "#6b7280" }, title: { display: true, text: "Votes per recorded row", color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } }
+        }
+      }
+    });
+  }
+
+  function renderFinalComparison(analytics) {
+    const observedShareOfFinal = analytics.last.total_votes ? (analytics.captured.total / analytics.last.total_votes) * 100 : 0;
+    document.getElementById("final-summary").innerHTML = `
+      <div class="summary-card"><span class="k">Opening Snapshot Total</span><div class="v">${CMTracker.formatNumber(analytics.first.total_votes)}</div></div>
+      <div class="summary-card"><span class="k">Latest Snapshot Total</span><div class="v">${CMTracker.formatNumber(analytics.last.total_votes)}</div></div>
+      <div class="summary-card"><span class="k">Directly Observed Share</span><div class="v">${CMTracker.formatPercent(observedShareOfFinal)}</div></div>
+      <div class="summary-card"><span class="k">Long Gaps + Timeout</span><div class="v">${analytics.gaps.length} + ${analytics.errorEvents.length}</div></div>`;
+
+    finalComparisonChart = createOrReplace(finalComparisonChart, "final-comparison-chart", {
+      type: "bar",
+      data: {
+        labels: ["Venugopal", "Satheesan", "Chennithala"],
+        datasets: [
+          {
+            label: "At First Snapshot",
+            data: [analytics.startVotes.venugopal, analytics.startVotes.satheesan, analytics.startVotes.chennithala],
+            backgroundColor: "rgba(148, 163, 184, 0.7)",
+            borderRadius: 8
+          },
+          {
+            label: "Added During Tracking",
+            data: [analytics.captured.venugopal, analytics.captured.satheesan, analytics.captured.chennithala],
+            backgroundColor: ["rgba(194, 65, 12, 0.8)", "rgba(37, 99, 235, 0.8)", "rgba(4, 120, 87, 0.8)"],
+            borderRadius: 8
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        plugins: { legend: { labels: { color: "#4b5563" } } },
+        scales: {
+          x: { stacked: true, ticks: { color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { stacked: true, ticks: { color: "#6b7280" }, grid: { display: false } }
+        }
+      }
+    });
+
+    document.getElementById("possible-causes").innerHTML = `
+      <strong>Why the tracked flow may not fully match the source totals:</strong>
+      <ul>
+        <li>The tracker began after ${CMTracker.formatNumber(analytics.first.total_votes)} votes were already on the board.</li>
+        <li>The biggest jumps in the dataset tend to cluster around gaps, which is consistent with batched source updates or delayed capture.</li>
+        <li>The dataset contains ${analytics.errorEvents.length} timeout row, which means at least one source read failed outright.</li>
+        <li>Those limits justify caution. They do not justify certainty about the exact mechanism behind every mismatch.</li>
+      </ul>`;
+  }
+
+  function renderKeyFindings(analytics) {
+    const biggestSpike = analytics.topSpikes[0];
+    const strongestHour = analytics.hourly.slice().sort((left, right) => right.total - left.total)[0];
+    const longestGap = analytics.gaps.slice().sort((left, right) => right.minutes - left.minutes)[0];
+    const satVsVen = analytics.captured.venugopal ? analytics.captured.satheesan / analytics.captured.venugopal : 0;
+
+    document.getElementById("key-findings").innerHTML = `
+      <article class="finding"><strong>Tracker dominance</strong><br>Satheesan captured ${CMTracker.formatPercent(analytics.captureShare.satheesan)} of all newly observed votes, while Venugopal and Chennithala each stayed near four per cent.</article>
+      <article class="finding"><strong>Most of the tally came before tracking</strong><br>The first valid row already contained ${CMTracker.formatNumber(analytics.first.total_votes)} votes, which is ${CMTracker.formatPercent((analytics.first.total_votes / analytics.last.total_votes) * 100)} of the final source total.</article>
+      <article class="finding"><strong>Gap-linked bursts matter</strong><br>The largest recorded jump was ${CMTracker.formatNumber(biggestSpike.deltaTotal)} votes at ${biggestSpike.timestamp}. The longest gap in the dataset lasted ${longestGap ? longestGap.minutes.toFixed(1) : "0.0"} minutes.</article>
+      <article class="finding"><strong>Morning was much hotter than night</strong><br>Average total additions fell from ${analytics.timeBands.morning.toFixed(1)} per recorded row in the morning to ${analytics.timeBands.night.toFixed(1)} in the 20:00-22:59 band.</article>
+      <article class="finding"><strong>Venugopal vs Satheesan</strong><br>During the captured window, Satheesan added roughly ${satVsVen.toFixed(1)} times as many votes as Venugopal.</article>
+      <article class="finding"><strong>Best hour for raw additions</strong><br>The heaviest hourly block was ${strongestHour ? strongestHour.label : "n/a"}, when ${CMTracker.formatNumber(strongestHour ? strongestHour.total : 0)} votes were added and Satheesan took ${strongestHour && strongestHour.total ? CMTracker.formatPercent((strongestHour.satheesan / strongestHour.total) * 100) : "-"} of that hour.</article>`;
+  }
+
+  function renderTrendCharts(analytics) {
+    const labels = analytics.rows.map((row) => row.timestampDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+
+    cumulativeChart = createOrReplace(cumulativeChart, "cumulative-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Satheesan", data: analytics.rows.map((row) => row.vd_satheesan_votes), borderColor: "#2563eb", pointRadius: 0, tension: 0.14 },
+          { label: "Venugopal", data: analytics.rows.map((row) => row.kc_venugopal_votes), borderColor: "#c2410c", pointRadius: 0, tension: 0.14 },
+          { label: "Chennithala", data: analytics.rows.map((row) => row.ramesh_chennithala_votes), borderColor: "#047857", pointRadius: 0, tension: 0.14 }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: "#4b5563" } } },
+        scales: {
+          x: { ticks: { color: "#6b7280", maxTicksLimit: 18 }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { ticks: { color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } }
+        }
+      }
+    });
+
+    shareShiftChart = createOrReplace(shareShiftChart, "share-shift-chart", {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Satheesan %", data: analytics.rows.map((row) => row.vd_satheesan_pct), borderColor: "#2563eb", pointRadius: 0, tension: 0.14 },
+          { label: "Venugopal %", data: analytics.rows.map((row) => row.kc_venugopal_pct), borderColor: "#c2410c", pointRadius: 0, tension: 0.14 },
+          { label: "Chennithala %", data: analytics.rows.map((row) => row.ramesh_chennithala_pct), borderColor: "#047857", pointRadius: 0, tension: 0.14 }
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { labels: { color: "#4b5563" } } },
+        scales: {
+          x: { ticks: { color: "#6b7280", maxTicksLimit: 18 }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { ticks: { color: "#6b7280" }, title: { display: true, text: "Share %", color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } }
+        }
+      }
+    });
+
+    hourlyChart = createOrReplace(hourlyChart, "hourly-chart", {
+      type: "bar",
+      data: {
+        labels: analytics.hourly.map((bucket) => bucket.label),
+        datasets: [
+          { label: "Satheesan", data: analytics.hourly.map((bucket) => bucket.satheesan), backgroundColor: "#2563eb" },
+          { label: "Venugopal", data: analytics.hourly.map((bucket) => bucket.venugopal), backgroundColor: "#c2410c" },
+          { label: "Chennithala", data: analytics.hourly.map((bucket) => bucket.chennithala), backgroundColor: "#047857" }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { stacked: true, ticks: { color: "#6b7280", maxRotation: 0, autoSkip: true }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { stacked: true, ticks: { color: "#6b7280" }, title: { display: true, text: "Votes added", color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } }
+        },
+        plugins: { legend: { labels: { color: "#4b5563" } } }
+      }
+    });
+  }
+
+  function renderHourlyTable(analytics) {
+    document.getElementById("hourly-table").innerHTML = analytics.hourly.map((bucket) => {
+      const satShare = bucket.total ? (bucket.satheesan / bucket.total) * 100 : 0;
+      const avgPerRow = bucket.count ? bucket.total / bucket.count : 0;
+      return `
+        <tr>
+          <td>${bucket.label}</td>
+          <td>${CMTracker.formatNumber(bucket.total)}</td>
+          <td>${CMTracker.formatNumber(bucket.venugopal)}</td>
+          <td>${CMTracker.formatNumber(bucket.satheesan)}</td>
+          <td>${CMTracker.formatNumber(bucket.chennithala)}</td>
+          <td>${CMTracker.formatPercent(satShare)}</td>
+          <td>${avgPerRow.toFixed(1)}</td>
+        </tr>`;
+    }).join("");
+  }
+
+  function setupTimeline(analytics) {
+    const slider = document.getElementById("timeline-slider");
+    const label = document.getElementById("timeline-label");
+    const button = document.getElementById("play-btn");
+
+    timelineChart = createOrReplace(timelineChart, "timeline-chart", {
+      type: "bar",
+      data: {
+        labels: ["Venugopal", "Satheesan", "Chennithala"],
+        datasets: [{
+          data: [analytics.rows[0].kc_venugopal_votes, analytics.rows[0].vd_satheesan_votes, analytics.rows[0].ramesh_chennithala_votes],
+          backgroundColor: ["#c2410c", "#2563eb", "#047857"],
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        animation: { duration: 0 },
+        scales: {
+          x: { ticks: { color: "#6b7280" }, grid: { color: "rgba(203, 213, 225, 0.25)" } },
+          y: { ticks: { color: "#374151" }, grid: { display: false } }
+        }
+      }
+    });
+
+    function update(index) {
+      const row = analytics.rows[index];
+      timelineChart.data.datasets[0].data = [row.kc_venugopal_votes, row.vd_satheesan_votes, row.ramesh_chennithala_votes];
+      timelineChart.update();
+      label.textContent = `${row.timestamp} | Total ${CMTracker.formatNumber(row.total_votes)} | Delta ${CMTracker.formatNumber(row.delta_total)}`;
     }
 
-    function renderAll() {
-        const first = rawData[0];
-        const last = rawData[rawData.length - 1];
-        const totalCaptured = last.total - first.total;
-        const capturedVenugopal = last.venugopal - first.venugopal;
-        const capturedSatheesan = last.satheesan - first.satheesan;
-        const capturedChennithala = last.chennithala - first.chennithala;
+    slider.max = analytics.rows.length - 1;
+    slider.value = 0;
+    slider.addEventListener("input", () => update(parseInt(slider.value, 10)));
 
-        // Summary cards
-        document.getElementById('summary-cards').innerHTML = `
-            <div class="card"><div class="card-label">Total Votes (Final)</div><div class="card-value">${last.total.toLocaleString()}</div><div class="card-detail">As of ${last.timestamp.toLocaleString()}</div></div>
-            <div class="card"><div class="card-label">KC Venugopal</div><div class="card-value venugopal">${last.venugopal.toLocaleString()}</div><div class="card-detail">${last.venugopal_pct}% share</div></div>
-            <div class="card"><div class="card-label">VD Satheesan</div><div class="card-value satheesan">${last.satheesan.toLocaleString()}</div><div class="card-detail">${last.satheesan_pct}% share</div></div>
-            <div class="card"><div class="card-label">Ramesh Chennithala</div><div class="card-value chennithala">${last.chennithala.toLocaleString()}</div><div class="card-detail">${last.chennithala_pct}% share</div></div>
-        `;
+    button.addEventListener("click", () => {
+      if (timelineTimer) {
+        clearInterval(timelineTimer);
+        timelineTimer = null;
+        button.textContent = "Play";
+        return;
+      }
 
-        // Delta cards
-        const satPctOfNew = ((capturedSatheesan / totalCaptured) * 100).toFixed(1);
-        const venPctOfNew = ((capturedVenugopal / totalCaptured) * 100).toFixed(1);
-        const chePctOfNew = ((capturedChennithala / totalCaptured) * 100).toFixed(1);
+      button.textContent = "Pause";
+      if (parseInt(slider.value, 10) >= analytics.rows.length - 1) {
+        slider.value = 0;
+      }
 
-        document.getElementById('delta-cards').innerHTML = `
-            <div class="card"><div class="card-label">Votes During Capture</div><div class="card-value">${totalCaptured.toLocaleString()}</div><div class="card-detail">~${(totalCaptured / ((last.timestamp - first.timestamp) / 60000)).toFixed(1)} votes/min avg</div></div>
-            <div class="card"><div class="card-label">Venugopal (New)</div><div class="card-value venugopal">+${capturedVenugopal.toLocaleString()}</div><div class="card-detail">${venPctOfNew}% of new votes</div></div>
-            <div class="card"><div class="card-label">Satheesan (New)</div><div class="card-value satheesan">+${capturedSatheesan.toLocaleString()}</div><div class="card-detail">${satPctOfNew}% of new votes</div></div>
-            <div class="card"><div class="card-label">Chennithala (New)</div><div class="card-value chennithala">+${capturedChennithala.toLocaleString()}</div><div class="card-detail">${chePctOfNew}% of new votes</div></div>
-        `;
-
-        // Overall pie
-        new Chart(document.getElementById('chart-overall-pie'), {
-            type: 'doughnut',
-            data: {
-                labels: ['KC Venugopal', 'VD Satheesan', 'Ramesh Chennithala'],
-                datasets: [{
-                    data: [last.venugopal, last.satheesan, last.chennithala],
-                    backgroundColor: ['#f97316', '#3b82f6', '#10b981'],
-                    borderColor: '#1e293b',
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
-                }
-            }
-        });
-
-        // Delta pie
-        new Chart(document.getElementById('chart-delta-pie'), {
-            type: 'doughnut',
-            data: {
-                labels: ['KC Venugopal', 'VD Satheesan', 'Ramesh Chennithala'],
-                datasets: [{
-                    data: [capturedVenugopal, capturedSatheesan, capturedChennithala],
-                    backgroundColor: ['#f97316', '#3b82f6', '#10b981'],
-                    borderColor: '#1e293b',
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
-                }
-            }
-        });
-
-        // Rate chart (5-min moving average)
-        const windowSize = 5;
-        const rateLabels = [];
-        const rateVen = [], rateSat = [], rateChe = [], rateTotal = [];
-
-        for (let i = windowSize; i < rawData.length; i++) {
-            // Skip large gaps (more than 5 min between points)
-            const gap = (rawData[i].timestamp - rawData[i-1].timestamp) / 60000;
-            if (gap > 10) continue;
-
-            let sumV = 0, sumS = 0, sumC = 0, sumT = 0;
-            let count = 0;
-            for (let j = i - windowSize + 1; j <= i; j++) {
-                const g = (rawData[j].timestamp - rawData[j-1].timestamp) / 60000;
-                if (g > 5) continue;
-                sumV += rawData[j].delta_venugopal;
-                sumS += rawData[j].delta_satheesan;
-                sumC += rawData[j].delta_chennithala;
-                sumT += rawData[j].delta_total;
-                count++;
-            }
-            if (count === 0) continue;
-
-            rateLabels.push(rawData[i].timestamp);
-            rateVen.push(sumV / count);
-            rateSat.push(sumS / count);
-            rateChe.push(sumC / count);
-            rateTotal.push(sumT / count);
+      timelineTimer = window.setInterval(() => {
+        const nextValue = parseInt(slider.value, 10) + 1;
+        if (nextValue >= analytics.rows.length) {
+          clearInterval(timelineTimer);
+          timelineTimer = null;
+          button.textContent = "Play";
+          return;
         }
 
-        new Chart(document.getElementById('chart-rate'), {
-            type: 'line',
-            data: {
-                labels: rateLabels.map(d => d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})),
-                datasets: [
-                    { label: 'Satheesan', data: rateSat, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3, pointRadius: 0 },
-                    { label: 'Venugopal', data: rateVen, borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', fill: true, tension: 0.3, pointRadius: 0 },
-                    { label: 'Chennithala', data: rateChe, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3, pointRadius: 0 },
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    x: { ticks: { color: '#64748b', maxTicksLimit: 20 }, grid: { color: '#1e293b' } },
-                    y: { title: { display: true, text: 'Votes/min', color: '#64748b' }, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-                },
-                plugins: { legend: { labels: { color: '#94a3b8' } } }
-            }
-        });
+        slider.value = nextValue;
+        update(nextValue);
+      }, 70);
+    });
 
-        // Cumulative chart
-        const cumLabels = rawData.map(d => d.timestamp);
-        new Chart(document.getElementById('chart-cumulative'), {
-            type: 'line',
-            data: {
-                labels: cumLabels.map(d => d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})),
-                datasets: [
-                    { label: 'Satheesan', data: rawData.map(d => d.satheesan), borderColor: '#3b82f6', pointRadius: 0, tension: 0.1 },
-                    { label: 'Venugopal', data: rawData.map(d => d.venugopal), borderColor: '#f97316', pointRadius: 0, tension: 0.1 },
-                    { label: 'Chennithala', data: rawData.map(d => d.chennithala), borderColor: '#10b981', pointRadius: 0, tension: 0.1 },
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    x: { ticks: { color: '#64748b', maxTicksLimit: 20 }, grid: { color: '#1e293b' } },
-                    y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-                },
-                plugins: { legend: { labels: { color: '#94a3b8' } } }
-            }
-        });
+    update(0);
+  }
 
-        // Percentage shift chart
-        new Chart(document.getElementById('chart-pct'), {
-            type: 'line',
-            data: {
-                labels: cumLabels.map(d => d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})),
-                datasets: [
-                    { label: 'Satheesan %', data: rawData.map(d => d.satheesan_pct), borderColor: '#3b82f6', pointRadius: 0, tension: 0.1 },
-                    { label: 'Venugopal %', data: rawData.map(d => d.venugopal_pct), borderColor: '#f97316', pointRadius: 0, tension: 0.1 },
-                    { label: 'Chennithala %', data: rawData.map(d => d.chennithala_pct), borderColor: '#10b981', pointRadius: 0, tension: 0.1 },
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    x: { ticks: { color: '#64748b', maxTicksLimit: 20 }, grid: { color: '#1e293b' } },
-                    y: { title: { display: true, text: '%', color: '#64748b' }, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-                },
-                plugins: { legend: { labels: { color: '#94a3b8' } } }
-            }
-        });
+  async function attachImages() {
+    await Promise.all(CMTracker.ORDER.map(async (candidateId) => {
+      const candidate = CMTracker.CANDIDATES[candidateId];
+      const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
+      const target = document.getElementById(`candidate-image-${candidateId}`);
+      if (target && image) {
+        target.src = image;
+      }
+    }));
+  }
 
-        // Hourly breakdown
-        const hourlyData = {};
-        for (let i = 1; i < rawData.length; i++) {
-            const gap = (rawData[i].timestamp - rawData[i-1].timestamp) / 60000;
-            if (gap > 10) continue; // skip gaps
-
-            const hour = rawData[i].timestamp.getHours();
-            const key = `${rawData[i].timestamp.getMonth()+1}/${rawData[i].timestamp.getDate()} ${String(hour).padStart(2,'0')}:00`;
-            if (!hourlyData[key]) hourlyData[key] = { ven: 0, sat: 0, che: 0, total: 0, count: 0 };
-            hourlyData[key].ven += rawData[i].delta_venugopal;
-            hourlyData[key].sat += rawData[i].delta_satheesan;
-            hourlyData[key].che += rawData[i].delta_chennithala;
-            hourlyData[key].total += rawData[i].delta_total;
-            hourlyData[key].count++;
-        }
-
-        const hourKeys = Object.keys(hourlyData);
-        new Chart(document.getElementById('chart-hourly'), {
-            type: 'bar',
-            data: {
-                labels: hourKeys,
-                datasets: [
-                    { label: 'Satheesan', data: hourKeys.map(k => hourlyData[k].sat), backgroundColor: '#3b82f6' },
-                    { label: 'Venugopal', data: hourKeys.map(k => hourlyData[k].ven), backgroundColor: '#f97316' },
-                    { label: 'Chennithala', data: hourKeys.map(k => hourlyData[k].che), backgroundColor: '#10b981' },
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: { stacked: true, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
-                    y: { stacked: true, title: { display: true, text: 'Votes', color: '#64748b' }, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-                },
-                plugins: { legend: { labels: { color: '#94a3b8' } } }
-            }
-        });
-
-        // Hourly table
-        const tbody = document.querySelector('#hourly-table tbody');
-        for (const key of hourKeys) {
-            const d = hourlyData[key];
-            const satPct = d.total > 0 ? ((d.sat / d.total) * 100).toFixed(1) : '0';
-            const avgPerMin = d.count > 0 ? (d.total / d.count).toFixed(1) : '0';
-            tbody.innerHTML += `<tr>
-                <td>${key}</td>
-                <td>${d.total.toLocaleString()}</td>
-                <td class="venugopal">${d.ven.toLocaleString()}</td>
-                <td class="satheesan">${d.sat.toLocaleString()}</td>
-                <td class="chennithala">${d.che.toLocaleString()}</td>
-                <td><strong>${satPct}%</strong></td>
-                <td>${avgPerMin}</td>
-            </tr>`;
-        }
-
-        // Animated chart
-        const animChart = new Chart(document.getElementById('chart-animated'), {
-            type: 'bar',
-            data: {
-                labels: ['KC Venugopal', 'VD Satheesan', 'Ramesh Chennithala'],
-                datasets: [{
-                    data: [first.venugopal, first.satheesan, first.chennithala],
-                    backgroundColor: ['#f97316', '#3b82f6', '#10b981'],
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                indexAxis: 'y',
-                scales: {
-                    x: { min: 0, max: last.satheesan * 1.05, ticks: { color: '#64748b' }, grid: { color: '#1e293b' } },
-                    y: { ticks: { color: '#e2e8f0', font: { size: 14 } }, grid: { display: false } }
-                },
-                plugins: { legend: { display: false } },
-                animation: { duration: 0 }
-            }
-        });
-
-        const slider = document.getElementById('timeline-slider');
-        const tsDisplay = document.getElementById('timestamp-display');
-        const playBtn = document.getElementById('play-btn');
-        slider.max = rawData.length - 1;
-
-        function updateAnimatedChart(idx) {
-            const d = rawData[idx];
-            animChart.data.datasets[0].data = [d.venugopal, d.satheesan, d.chennithala];
-            animChart.update();
-            tsDisplay.textContent = `${d.timestamp.toLocaleString()} | Total: ${d.total.toLocaleString()} | Δ${d.delta_total}/min`;
-        }
-
-        slider.addEventListener('input', () => updateAnimatedChart(+slider.value));
-
-        let playing = false;
-        let playInterval = null;
-        playBtn.addEventListener('click', () => {
-            if (playing) {
-                clearInterval(playInterval);
-                playBtn.textContent = '▶';
-                playing = false;
-            } else {
-                playing = true;
-                playBtn.textContent = '⏸';
-                if (+slider.value >= rawData.length - 1) slider.value = 0;
-                playInterval = setInterval(() => {
-                    let v = +slider.value + 1;
-                    if (v >= rawData.length) { clearInterval(playInterval); playBtn.textContent = '▶'; playing = false; return; }
-                    slider.value = v;
-                    updateAnimatedChart(v);
-                }, 50);
-            }
-        });
-
-        updateAnimatedChart(0);
-
-        // Insights
-        // Calculate key metrics
-        const morningRate = []; // 7-10
-        const afternoonRate = []; // 12-15
-        const eveningRate = []; // 17-20
-        const nightRate = []; // 20-23
-
-        for (let i = 1; i < rawData.length; i++) {
-            const gap = (rawData[i].timestamp - rawData[i-1].timestamp) / 60000;
-            if (gap > 5) continue;
-            const h = rawData[i].timestamp.getHours();
-            if (h >= 7 && h < 10) morningRate.push(rawData[i].delta_total);
-            else if (h >= 12 && h < 15) afternoonRate.push(rawData[i].delta_total);
-            else if (h >= 17 && h < 20) eveningRate.push(rawData[i].delta_total);
-            else if (h >= 20 && h < 23) nightRate.push(rawData[i].delta_total);
-        }
-
-        const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1) : 0;
-
-        // Satheesan's share of delta over time
-        let earlyDeltas = { sat: 0, total: 0 };
-        let lateDeltas = { sat: 0, total: 0 };
-        const midpoint = Math.floor(rawData.length / 2);
-        for (let i = 1; i < rawData.length; i++) {
-            const gap = (rawData[i].timestamp - rawData[i-1].timestamp) / 60000;
-            if (gap > 5) continue;
-            if (i < midpoint) { earlyDeltas.sat += rawData[i].delta_satheesan; earlyDeltas.total += rawData[i].delta_total; }
-            else { lateDeltas.sat += rawData[i].delta_satheesan; lateDeltas.total += rawData[i].delta_total; }
-        }
-
-        const earlySatPct = (earlyDeltas.sat / earlyDeltas.total * 100).toFixed(1);
-        const lateSatPct = (lateDeltas.sat / lateDeltas.total * 100).toFixed(1);
-
-        // Find max spike
-        let maxDelta = 0, maxDeltaIdx = 0;
-        for (let i = 1; i < rawData.length; i++) {
-            if (rawData[i].delta_total > maxDelta) { maxDelta = rawData[i].delta_total; maxDeltaIdx = i; }
-        }
-
-        // Venugopal zero-vote minutes
-        let venZeroCount = 0;
-        let validMinutes = 0;
-        for (let i = 1; i < rawData.length; i++) {
-            const gap = (rawData[i].timestamp - rawData[i-1].timestamp) / 60000;
-            if (gap > 5) continue;
-            validMinutes++;
-            if (rawData[i].delta_venugopal === 0) venZeroCount++;
-        }
-
-        document.getElementById('insights').innerHTML = `
-            <div class="insight-box critical">
-                <strong>🚨 Massive Dominance:</strong> Satheesan captured <strong>${satPctOfNew}%</strong> of all new votes during tracking
-                (${capturedSatheesan.toLocaleString()} out of ${totalCaptured.toLocaleString()}). Venugopal got only ${venPctOfNew}%
-                despite starting at 39.2%.
-            </div>
-            <div class="insight-box warning">
-                <strong>⏰ Voting Rate Collapse:</strong> Morning avg was <strong>${avg(morningRate)} votes/min</strong>,
-                afternoon dropped to <strong>${avg(afternoonRate)}</strong>, evening to <strong>${avg(eveningRate)}</strong>,
-                night to <strong>${avg(nightRate)}</strong>. Clear time-of-day dependency.
-            </div>
-            <div class="insight-box">
-                <strong>📊 Consistency:</strong> Satheesan's share of new votes was ${earlySatPct}% in the first half and
-                ${lateSatPct}% in the second half — remarkably stable dominance regardless of voting rate.
-            </div>
-            <div class="insight-box warning">
-                <strong>🔇 Venugopal Stagnation:</strong> In ${venZeroCount} out of ${validMinutes} tracked minutes (${(venZeroCount/validMinutes*100).toFixed(1)}%),
-                Venugopal received <strong>zero</strong> new votes. His campaign appears to have negligible active momentum.
-            </div>
-            <div class="insight-box">
-                <strong>📡 Spike at ${rawData[maxDeltaIdx].timestamp.toLocaleTimeString()}:</strong> ${maxDelta} votes in one interval
-                (likely a gap recovery). The tracker detected ${rawData.filter(d => d.alert).length} anomaly alerts.
-            </div>
-
-            <h3 style="margin-top: 24px; margin-bottom: 12px;">Hypotheses</h3>
-
-            <div class="hypothesis">
-                <h4>H1: Organic Voter Behavior vs. Coordinated Campaign</h4>
-                <p>Satheesan's vote rate is ~15-20x Venugopal's consistently. If this were organic voting, we'd expect
-                some variance in ratio based on time of day (different demographics vote at different times).
-                The near-constant ratio suggests either overwhelming organic preference OR systematic automated behavior
-                benefiting Satheesan. <span class="tag">needs external validation</span></p>
-            </div>
-
-            <div class="hypothesis">
-                <h4>H2: Chennithala is a Non-Factor</h4>
-                <p>At 5.5% and shrinking, Chennithala's vote acquisition rate is a trickle (~2-4 votes/min vs Satheesan's 60-80).
-                His presence may be splitting anti-Venugopal votes negligibly. <span class="tag">confirmed by data</span></p>
-            </div>
-
-            <div class="hypothesis">
-                <h4>H3: Night Voting Pattern Suggests Bot Activity</h4>
-                <p>After 10 PM, voting drops to 8-15 votes/min total — but Satheesan STILL captures 80%+. At 3 AM,
-                there are still 1-3 votes/min flowing almost exclusively to Satheesan. Human voters are asleep;
-                these residual votes could be automated or from different time zones. <span class="tag">suspicious</span></p>
-            </div>
-
-            <div class="hypothesis">
-                <h4>H4: Venugopal's Initial 39% May Include Pre-Loaded Votes</h4>
-                <p>Given that Venugopal gets almost no organic votes during tracking (only ${venPctOfNew}% of new),
-                his initial 39.2% (184,106 votes) may have been front-loaded before real voting began or from an
-                earlier campaign period that has since lost momentum. <span class="tag">speculative</span></p>
-            </div>
-
-            <div class="hypothesis">
-                <h4>H5: The Poll Outcome is Already Decided</h4>
-                <p>At current rates, even if tracking continued indefinitely, the gap would only widen. Satheesan's
-                percentage grew from 55.1% → ${last.satheesan_pct}% in ~20 hours. Extrapolating: at the observed
-                delta rate, Satheesan's lead grows by ~0.15% per hour. <span class="tag">mathematical certainty</span></p>
-            </div>
-        `;
+  async function init() {
+    try {
+      const dataset = await CMTracker.loadDataset();
+      const analytics = CMTracker.computeAnalytics(dataset);
+      renderHero(analytics);
+      renderCandidateGrid(analytics);
+      renderMethodology(analytics);
+      renderComparison(analytics);
+      renderTrackingWindow(analytics);
+      renderFinalComparison(analytics);
+      renderKeyFindings(analytics);
+      renderTrendCharts(analytics);
+      renderHourlyTable(analytics);
+      setupTimeline(analytics);
+      attachImages();
+    } catch (error) {
+      document.getElementById("window-range").textContent = "Unable to load poll_data.csv";
+      document.getElementById("window-votes").textContent = "-";
+      document.getElementById("final-total").textContent = "-";
+      document.getElementById("gap-summary").textContent = "-";
     }
-    </script>
+  }
+
+  init();
+</script>
 </body>
 </html>

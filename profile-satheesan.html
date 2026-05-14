@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V.D. Satheesan | Kerala CM 2026 Profile</title>
+<script src="site-data.js"></script>
+<style>
+  :root {
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.14);
+    --paper: #f7fbff;
+    --line: #c6dbff;
+    --ink: #1f2937;
+    --muted: #6b7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100vh;
+    padding: 24px;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 82% 16%, var(--accent-soft), transparent 28%),
+      linear-gradient(140deg, #f8fbff 0%, #ebf3ff 55%, #f7fbff 100%);
+  }
+
+  .shell { max-width: 980px; margin: 0 auto; }
+
+  .back-link,
+  .hero-links a {
+    text-decoration: none;
+    color: #1d4ed8;
+    border: 1px solid #60a5fa;
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: #eff6ff;
+    font-size: 0.86rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+
+  .hero,
+  .panel,
+  .stat,
+  .swot-card,
+  .research-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+  }
+
+  .hero {
+    border-radius: 20px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 18px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .hero img {
+    width: 140px;
+    height: 140px;
+    border-radius: 24px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    background: #f3f4f6;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 7px;
+  }
+
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    color: #1d4ed8;
+    margin-bottom: 5px;
+  }
+
+  .hero-role,
+  .hero-summary,
+  .panel p,
+  .research-card,
+  li {
+    color: #4b5563;
+    line-height: 1.65;
+  }
+
+  .hero-role { font-size: 0.95rem; margin-bottom: 8px; }
+  .hero-summary { margin-bottom: 12px; }
+
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero-stats,
+  .metric-grid,
+  .swot-grid,
+  .research-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .hero-stats,
+  .metric-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .hero-stats {
+    margin: 0 0 16px;
+  }
+
+  .stat {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .value {
+    font-weight: 700;
+    font-size: 1.02rem;
+  }
+
+  .panel {
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  h2 {
+    color: #1d4ed8;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .swot-grid,
+  .research-grid {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+
+  .swot-card,
+  .research-card {
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+  }
+
+  .swot-card h3,
+  .research-card strong {
+    color: #1d4ed8;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  ul,
+  ol {
+    padding-left: 18px;
+  }
+
+  li { margin-bottom: 8px; }
+
+  .panel-note {
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+
+  .sources a { color: #1d4ed8; }
+
+  @media (max-width: 700px) {
+    body { padding: 16px; }
+    .hero { grid-template-columns: 1fr; }
+    .hero img { width: 110px; height: 110px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <a class="back-link" href="index.html">Back to candidate hub</a>
+
+  <section class="hero">
+    <img id="candidate-image" src="https://ui-avatars.com/api/?name=VD+Satheesan&background=f3f4f6&color=111827&size=260" alt="V.D. Satheesan">
+    <div>
+      <span class="eyebrow">Candidate Profile</span>
+      <h1 id="candidate-name">V.D. Satheesan</h1>
+      <p class="hero-role" id="candidate-role"></p>
+      <p class="hero-summary" id="hero-summary"></p>
+      <div class="hero-links">
+        <a href="inc-impact.html">INC scenario lens</a>
+        <a href="dashboard.html">Open legacy tracker</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="hero-stats" id="hero-stats"></div>
+
+  <section class="panel">
+    <h2>Live Snapshot</h2>
+    <div class="metric-grid" id="metric-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Tracking Window Reading</h2>
+    <p id="tracking-reading">Loading...</p>
+  </section>
+
+  <section class="panel">
+    <h2>SWOT Analysis</h2>
+    <div class="swot-grid" id="swot-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Research Context</h2>
+    <div class="research-grid" id="research-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Signals To Watch</h2>
+    <ul id="signals-list"></ul>
+    <p class="panel-note">This profile is neutral. It reads the tracked window alongside public-role context rather than treating either one as a final verdict.</p>
+  </section>
+
+  <section class="panel sources">
+    <h2>Sources</h2>
+    <ol>
+      <li><a href="https://en.wikipedia.org/wiki/V._D._Satheesan" target="_blank" rel="noreferrer">V.D. Satheesan</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Indian_National_Congress" target="_blank" rel="noreferrer">Indian National Congress</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Karnataka_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Karnataka Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2023_Telangana_Legislative_Assembly_election" target="_blank" rel="noreferrer">2023 Telangana Legislative Assembly election</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/2022_Himachal_Pradesh_Legislative_Assembly_election" target="_blank" rel="noreferrer">2022 Himachal Pradesh Legislative Assembly election</a></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+  const PROFILE_KEY = "satheesan";
+
+  function trackingNarrative(stats, analytics) {
+    const largestSpike = analytics.topSpikes[0];
+    return `The tracked window opened with Satheesan on ${CMTracker.formatPercent(stats.startingShare)} and ${CMTracker.formatNumber(stats.startingVotes)} votes. He closed the final valid row on ${CMTracker.formatPercent(stats.currentShare)} and ${CMTracker.formatNumber(stats.currentVotes)} votes, after adding ${CMTracker.formatNumber(stats.addedVotes)} votes. That amounted to ${CMTracker.formatPercent(stats.captureShare)} of all newly observed votes. Even after allowing for gaps and spike-heavy periods, the captured window tilted clearly in his favour, and the biggest recorded burst at ${largestSpike.timestamp} also landed overwhelmingly on his side.`;
+  }
+
+  function renderSwot(candidate) {
+    const sections = [
+      ["Strengths", candidate.swot.strengths],
+      ["Weaknesses", candidate.swot.weaknesses],
+      ["Opportunities", candidate.swot.opportunities],
+      ["Threats", candidate.swot.threats]
+    ];
+
+    document.getElementById("swot-grid").innerHTML = sections.map(([title, items]) => `
+      <article class="swot-card">
+        <h3>${title}</h3>
+        <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
+      </article>`).join("");
+  }
+
+  function renderResearch(candidate) {
+    const extra = "Because INC has improved nationally and added recent state wins in Himachal, Karnataka and Telangana, a Satheesan decision would likely be read as the party privileging legislative mandate and public-facing momentum.[2][3][4][5]";
+    document.getElementById("research-grid").innerHTML = candidate.research.concat(extra).map((item) => `
+      <article class="research-card">${item}</article>`).join("");
+  }
+
+  async function init() {
+    const candidate = CMTracker.CANDIDATES[PROFILE_KEY];
+    document.title = `${candidate.name} | Kerala CM 2026 Profile`;
+    document.getElementById("candidate-role").textContent = candidate.role;
+    document.getElementById("hero-summary").textContent = candidate.descriptor;
+
+    try {
+      const dataset = await CMTracker.loadDataset();
+      const analytics = CMTracker.computeAnalytics(dataset);
+      const stats = CMTracker.getCandidateAnalytics(analytics, PROFILE_KEY);
+
+      document.getElementById("hero-stats").innerHTML = `
+        <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
+        <div class="stat"><span class="label">Window Share</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>
+        <div class="stat"><span class="label">Share Change</span><div class="value">${CMTracker.formatSigned(stats.shareChange, 1, " pts")}</div></div>`;
+
+      document.getElementById("metric-grid").innerHTML = `
+        <div class="stat"><span class="label">Current Votes</span><div class="value">${CMTracker.formatNumber(stats.currentVotes)}</div></div>
+        <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
+        <div class="stat"><span class="label">Starting Votes</span><div class="value">${CMTracker.formatNumber(stats.startingVotes)}</div></div>
+        <div class="stat"><span class="label">Starting Share</span><div class="value">${CMTracker.formatPercent(stats.startingShare)}</div></div>
+        <div class="stat"><span class="label">Votes Added In Window</span><div class="value">${CMTracker.formatNumber(stats.addedVotes)}</div></div>
+        <div class="stat"><span class="label">Share Of New Votes</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>`;
+
+      document.getElementById("tracking-reading").textContent = trackingNarrative(stats, analytics);
+      document.getElementById("signals-list").innerHTML = candidate.signals.map((item) => `<li>${item}</li>`).join("");
+      renderSwot(candidate);
+      renderResearch(candidate);
+
+      const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
+      if (image) {
+        document.getElementById("candidate-image").src = image;
+      }
+    } catch (error) {
+      document.getElementById("tracking-reading").textContent = "Unable to load poll_data.csv for this profile.";
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
