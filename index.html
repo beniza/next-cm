@@ -754,15 +754,24 @@
     document.getElementById("gap-summary").textContent = `${analytics.gaps.length} long gaps, ${analytics.errorEvents.length} timeout`;
   }
 
+  function renderWindowSnapshot(snapshot) {
+    const firstDate = new Date(snapshot.firstTimestamp.replace(" ", "T"));
+    const lastDate = new Date(snapshot.lastTimestamp.replace(" ", "T"));
+    document.getElementById("window-range").textContent = `${firstDate.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} -> ${lastDate.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`;
+    document.getElementById("window-votes").textContent = CMTracker.formatNumber(snapshot.capturedTotal);
+    document.getElementById("final-total").textContent = CMTracker.formatNumber(snapshot.lastTotal);
+    document.getElementById("gap-summary").textContent = `${snapshot.gapCount} long gaps, ${snapshot.errorCount} timeout`;
+  }
+
   function renderCandidateGrid(analytics) {
     const grid = document.getElementById("candidate-grid");
     grid.innerHTML = CMTracker.ORDER.map((candidateId) => {
       const candidate = CMTracker.CANDIDATES[candidateId];
-      const stats = CMTracker.getCandidateAnalytics(analytics, candidateId);
+      const stats = analytics ? CMTracker.getCandidateAnalytics(analytics, candidateId) : CMTracker.getCandidateSnapshot(candidateId);
       return `
         <article class="candidate-card">
           <div class="candidate-head">
-            <img id="candidate-image-${candidateId}" src="https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.short)}&background=f3f4f6&color=111827&size=220" alt="${candidate.name}">
+            <img id="candidate-image-${candidateId}" src="${candidate.imagePath}" alt="${candidate.name}">
             <div>
               <div class="candidate-name">${candidate.name}</div>
               <div class="candidate-role">${candidate.role}</div>
@@ -1155,18 +1164,10 @@
     update(0);
   }
 
-  async function attachImages() {
-    await Promise.all(CMTracker.ORDER.map(async (candidateId) => {
-      const candidate = CMTracker.CANDIDATES[candidateId];
-      const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
-      const target = document.getElementById(`candidate-image-${candidateId}`);
-      if (target && image) {
-        target.src = image;
-      }
-    }));
-  }
-
   async function init() {
+    renderWindowSnapshot(CMTracker.getWindowSnapshot());
+    renderCandidateGrid();
+
     try {
       const dataset = await CMTracker.loadDataset();
       const analytics = CMTracker.computeAnalytics(dataset);
@@ -1180,12 +1181,7 @@
       renderTrendCharts(analytics);
       renderHourlyTable(analytics);
       setupTimeline(analytics);
-      attachImages();
     } catch (error) {
-      document.getElementById("window-range").textContent = "Unable to load poll_data.csv";
-      document.getElementById("window-votes").textContent = "-";
-      document.getElementById("final-total").textContent = "-";
-      document.getElementById("gap-summary").textContent = "-";
     }
   }
 

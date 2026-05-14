@@ -240,7 +240,7 @@
   <a class="back-link" href="index.html">Back to candidate hub</a>
 
   <section class="hero">
-    <img id="candidate-image" src="https://ui-avatars.com/api/?name=Ramesh+Chennithala&background=f3f4f6&color=111827&size=260" alt="Ramesh Chennithala">
+    <img id="candidate-image" src="assets/images/chennithala.jpg" alt="Ramesh Chennithala">
     <div>
       <span class="eyebrow">Candidate Profile</span>
       <h1 id="candidate-name">Ramesh Chennithala</h1>
@@ -377,43 +377,43 @@
       </article>`).join("");
   }
 
+  function renderTrackingStats(stats) {
+    document.getElementById("hero-stats").innerHTML = `
+      <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
+      <div class="stat"><span class="label">Window Share</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>
+      <div class="stat"><span class="label">Share Change</span><div class="value">${CMTracker.formatSigned(stats.shareChange, 1, " pts")}</div></div>`;
+
+    document.getElementById("metric-grid").innerHTML = `
+      <div class="stat"><span class="label">Current Votes</span><div class="value">${CMTracker.formatNumber(stats.currentVotes)}</div></div>
+      <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
+      <div class="stat"><span class="label">Starting Votes</span><div class="value">${CMTracker.formatNumber(stats.startingVotes)}</div></div>
+      <div class="stat"><span class="label">Starting Share</span><div class="value">${CMTracker.formatPercent(stats.startingShare)}</div></div>
+      <div class="stat"><span class="label">Votes Added In Window</span><div class="value">${CMTracker.formatNumber(stats.addedVotes)}</div></div>
+      <div class="stat"><span class="label">Share Of New Votes</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>`;
+
+    document.getElementById("tracking-reading").textContent = trackingNarrative(stats);
+  }
+
   async function init() {
     const candidate = CMTracker.CANDIDATES[PROFILE_KEY];
+    const snapshot = CMTracker.getCandidateSnapshot(PROFILE_KEY);
     document.title = `${candidate.name} | Kerala CM 2026 Profile`;
+    document.getElementById("candidate-image").src = candidate.imagePath;
     document.getElementById("candidate-role").textContent = candidate.role;
     document.getElementById("hero-summary").textContent = candidate.descriptor;
+    document.getElementById("signals-list").innerHTML = candidate.signals.map((item) => `<li>${item}</li>`).join("");
+    renderSwot(candidate);
+    renderResearch(candidate);
+    renderTrackRecord(candidate);
+    renderPublicPerception(candidate);
+    renderTrackingStats(snapshot);
 
     try {
       const dataset = await CMTracker.loadDataset();
       const analytics = CMTracker.computeAnalytics(dataset);
       const stats = CMTracker.getCandidateAnalytics(analytics, PROFILE_KEY);
-
-      document.getElementById("hero-stats").innerHTML = `
-        <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
-        <div class="stat"><span class="label">Window Share</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>
-        <div class="stat"><span class="label">Share Change</span><div class="value">${CMTracker.formatSigned(stats.shareChange, 1, " pts")}</div></div>`;
-
-      document.getElementById("metric-grid").innerHTML = `
-        <div class="stat"><span class="label">Current Votes</span><div class="value">${CMTracker.formatNumber(stats.currentVotes)}</div></div>
-        <div class="stat"><span class="label">Current Share</span><div class="value">${CMTracker.formatPercent(stats.currentShare)}</div></div>
-        <div class="stat"><span class="label">Starting Votes</span><div class="value">${CMTracker.formatNumber(stats.startingVotes)}</div></div>
-        <div class="stat"><span class="label">Starting Share</span><div class="value">${CMTracker.formatPercent(stats.startingShare)}</div></div>
-        <div class="stat"><span class="label">Votes Added In Window</span><div class="value">${CMTracker.formatNumber(stats.addedVotes)}</div></div>
-        <div class="stat"><span class="label">Share Of New Votes</span><div class="value">${CMTracker.formatPercent(stats.captureShare)}</div></div>`;
-
-      document.getElementById("tracking-reading").textContent = trackingNarrative(stats);
-      document.getElementById("signals-list").innerHTML = candidate.signals.map((item) => `<li>${item}</li>`).join("");
-      renderSwot(candidate);
-      renderResearch(candidate);
-      renderTrackRecord(candidate);
-      renderPublicPerception(candidate);
-
-      const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
-      if (image) {
-        document.getElementById("candidate-image").src = image;
-      }
+      renderTrackingStats(stats);
     } catch (error) {
-      document.getElementById("tracking-reading").textContent = "Unable to load poll_data.csv for this profile.";
     }
   }
 

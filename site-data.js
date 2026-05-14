@@ -11,6 +11,7 @@
       accentClass: "v",
       profilePage: "profile-venugopal.html",
       wikiTitle: "K._C._Venugopal",
+      imagePath: "assets/images/venugopal.jpg",
       role: "AICC organisation leader | Alappuzha MP",
       positioning: "Organisation-heavy base",
       descriptor: "Organization-first option with a large starting base, but weak tracked-window conversion.",
@@ -93,7 +94,16 @@
         "Visible district endorsements matter more for him than another insider-heavy pitch.",
         "Any future batch where his capture share moves into double digits would materially improve the data story.",
         "His strongest argument is coherence and coordination, not recent vote-flow momentum."
-      ]
+      ],
+      trackingSnapshot: {
+        currentVotes: 186003,
+        currentShare: 36.0,
+        startingVotes: 184106,
+        startingShare: 39.2,
+        addedVotes: 1897,
+        captureShare: 4.031452555520136,
+        shareChange: -3.2
+      }
     },
     satheesan: {
       id: "satheesan",
@@ -104,6 +114,7 @@
       accentClass: "s",
       profilePage: "profile-satheesan.html",
       wikiTitle: "V._D._Satheesan",
+      imagePath: "assets/images/satheesan.jpg",
       role: "Legislative face | Paravur MLA",
       positioning: "Tracked-window frontrunner",
       descriptor: "Tracker leader and mass-facing legislative option.",
@@ -186,7 +197,16 @@
         "The data case is strongest when linked to a broader argument about governance readiness and constituency credibility.",
         "His challenge is no longer visibility; it is building an inclusion-first team narrative.",
         "If he is chosen, the operational question becomes integration rather than justification."
-      ]
+      ],
+      trackingSnapshot: {
+        currentVotes: 301929,
+        currentShare: 58.5,
+        startingVotes: 258658,
+        startingShare: 55.1,
+        addedVotes: 43271,
+        captureShare: 91.95834661566252,
+        shareChange: 3.4
+      }
     },
     chennithala: {
       id: "chennithala",
@@ -197,6 +217,7 @@
       accentClass: "c",
       profilePage: "profile-chennithala.html",
       wikiTitle: "Ramesh_Chennithala",
+      imagePath: "assets/images/chennithala.jpg",
       role: "Veteran reconciler | Haripad MLA",
       positioning: "Veteran consensus pitch",
       descriptor: "Veteran option with long experience and a stable but narrow tracked footprint.",
@@ -279,8 +300,27 @@
         "His case improves only if the debate shifts from momentum to stewardship and internal balance.",
         "He needs a stronger why-now argument than either of the other two contenders.",
         "Without that reframing, the tracker leaves him well outside the lead contest."
-      ]
+      ],
+      trackingSnapshot: {
+        currentVotes: 28511,
+        currentShare: 5.5,
+        startingVotes: 26624,
+        startingShare: 5.7,
+        addedVotes: 1887,
+        captureShare: 4.010200828817342,
+        shareChange: -0.2
+      }
     }
+  };
+
+  const WINDOW_SNAPSHOT = {
+    firstTimestamp: "2026-05-13 07:14:54",
+    lastTimestamp: "2026-05-14 08:55:42",
+    firstTotal: 469388,
+    lastTotal: 516443,
+    capturedTotal: 47055,
+    gapCount: 5,
+    errorCount: 6
   };
 
   function splitCSVLine(line) {
@@ -702,6 +742,22 @@
     };
   }
 
+  function getCandidateSnapshot(candidateId) {
+    const candidate = CANDIDATES[candidateId];
+    if (!candidate || !candidate.trackingSnapshot) {
+      throw new Error(`Unknown candidate snapshot: ${candidateId}`);
+    }
+
+    return {
+      candidate,
+      ...candidate.trackingSnapshot
+    };
+  }
+
+  function getWindowSnapshot() {
+    return { ...WINDOW_SNAPSHOT };
+  }
+
   async function loadWikipediaImage(title) {
     try {
       const response = await fetch(
@@ -721,6 +777,8 @@
     loadDataset,
     computeAnalytics,
     getCandidateAnalytics,
+    getCandidateSnapshot,
+    getWindowSnapshot,
     formatNumber,
     formatPercent,
     formatSigned,

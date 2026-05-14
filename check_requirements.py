@@ -28,6 +28,13 @@ def require_count(text: str, needle: str, expected: int, label: str) -> None:
         raise AssertionError(f"Unexpected {label}: expected {expected}, found {actual}")
 
 
+def require_order(text: str, first: str, second: str, label: str) -> None:
+    first_index = text.find(first)
+    second_index = text.find(second)
+    if first_index == -1 or second_index == -1 or first_index >= second_index:
+        raise AssertionError(f"Unexpected order for {label}: {first!r} should appear before {second!r}")
+
+
 def main() -> int:
     index = read_text("index.html")
     site_data = read_text("site-data.js")
@@ -82,10 +89,20 @@ def main() -> int:
         require_count(text, "<!DOCTYPE html>", 1, f"{name} document root")
         forbid(text, "Last 20m", f"{name} recent-window wording")
         forbid(text, "Profile Brief", f"{name} stale profile title")
+        forbid(text, "Unable to load poll_data.csv for this profile.", f"{name} raw csv error copy")
+        require_order(text, 'renderPublicPerception(candidate);', 'const dataset = await CMTracker.loadDataset();', f"{name} public perception render order")
+        require_order(text, 'renderTrackRecord(candidate);', 'const dataset = await CMTracker.loadDataset();', f"{name} track record render order")
+        require_order(text, 'document.getElementById("signals-list").innerHTML', 'const dataset = await CMTracker.loadDataset();', f"{name} signals render order")
+        require(text, 'CMTracker.getCandidateSnapshot(PROFILE_KEY)', f"{name} snapshot fallback helper")
+        require(text, 'candidate.imagePath', f"{name} local candidate image usage")
 
     require_count(site_data, "publicPerception:", 3, "candidate public-perception blocks")
     require_count(site_data, "overallScore:", 3, "candidate public-perception scores")
     require_count(site_data, "quotes:", 3, "candidate quote groups")
+    require_count(site_data, "imagePath:", 3, "site-data local candidate image paths")
+    require_count(site_data, "trackingSnapshot:", 3, "site-data candidate tracking snapshots")
+    require(site_data, "function getCandidateSnapshot(candidateId)", "site-data candidate snapshot helper")
+    require(site_data, "function getWindowSnapshot()", "site-data window snapshot helper")
     require(site_data, "No major change in Paravoor for last 25 years.", "Satheesan public quote")
     require(site_data, "What if KC Venugopal is playing the game to fail?", "Venugopal public quote")
     require(site_data, "Chennithala has at least administrative experience which will be of great help.", "Chennithala public quote")
@@ -116,6 +133,9 @@ def main() -> int:
     require(build_story, "We need to rewrite the content of this page for a first time visiot. it should be clear to the user about the purpose and how it will help him in answering the questions on the next cm.", "build-story homepage prompt")
     require(build_story, "https://thenextcm.com/ is the site we have tracked for data. it is not an official site... Keeping this in mind how do we write the content of the site to help the user see what we see?", "build-story source-framing prompt")
     require(build_story, "Gap-linked bursts comes from the fact that my computer was not connected to the internet... the burst after the reconnection is also justifyable as it is in consistent with the timeframe's expected total counts. (verify this)", "build-story gap prompt")
+    require(index, 'src="${candidate.imagePath}"', "homepage local candidate image usage")
+    require(index, 'CMTracker.getCandidateSnapshot(candidateId)', "homepage candidate snapshot fallback")
+    require(index, 'CMTracker.getWindowSnapshot()', "homepage window snapshot fallback")
 
     print("Requirement checks passed.")
     return 0
