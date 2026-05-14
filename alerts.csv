@@ -9,3 +9,7 @@ timestamp,alert
 2026-05-14 08:47:35,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
 2026-05-14 08:48:36,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
 2026-05-14 08:49:36,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
+2026-05-14 12:30:20,ERROR: HTTP Error 520: <none>
+2026-05-14 13:48:42,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
+2026-05-14 13:49:42,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
+2026-05-14 13:50:42,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
