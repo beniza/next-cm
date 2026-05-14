@@ -485,11 +485,12 @@
 <body>
 <div class="shell">
   <section class="hero">
-    <span class="eyebrow">Primary Election Briefing</span>
-    <h1>Kerala CM 2026 Candidate Intelligence Hub</h1>
-    <p class="sub">The primary narrative on this page is based on the full tracked window in poll_data.csv, not on a weak last-20-minute slice. Final totals are shown separately because the first valid snapshot already contained a large vote base, and the dataset includes long gaps, spike flags and one timeout row.</p>
+    <span class="eyebrow">Audit Briefing</span>
+    <h1>Kerala CM 2026 Poll Audit And Candidate Briefing</h1>
+    <p class="sub">This site begins with an unofficial Kerala CM poll hosted at thenextcm.com. We could not establish who owns thenextcm.com or when it was launched, so the source itself has to be treated cautiously. Our experiment was simple: track the public-facing vote stream over time, audit whether it looked obviously dumped or more continuously updated, and then ask what the captured record actually showed, including what happened across the local connectivity gaps during capture.</p>
     <div class="hero-actions">
       <a href="inc-impact.html">What the CM choice means for INC</a>
+      <a href="how-it-was-built.html">How This Was Built</a>
       <a href="dashboard.html">Open legacy tracker</a>
     </div>
     <div class="status-row">
@@ -512,11 +513,30 @@
     </div>
   </section>
 
+  <section class="panel">
+    <h2>Start Here</h2>
+    <p class="section-lead">What follows is a disciplined read of the record we captured. Within the tracked window, the visible stream looked fairly consistent rather than crudely dumped, but hidden manipulation still cannot be ruled out. The strongest result inside that window was clear: Satheesan received about 90% of all newly observed votes, while Venugopal and Chennithala stayed near 5% each. The larger post-gap jumps are best explained by local connectivity gaps during capture, and once normalized for elapsed gap time they closely match the surrounding vote rates.</p>
+    <div class="sources-grid">
+      <article class="source-card">
+        <strong>Read the audit first</strong>
+        <p>The homepage is organized around what was observed in the tracked stream, not around assumptions about who built the source or what the source intended to do.</p>
+      </article>
+      <article class="source-card">
+        <strong>Separate what was seen from what was inferred</strong>
+        <p>The stream tells us that Satheesan dominated newly arriving votes. It also tells us that the post-gap recovery rows fit offline catch-up better than a fresh anomaly, but it does not tell us, by itself, why Venugopal started with a large opening base or what was happening behind the source page.</p>
+      </article>
+      <article class="source-card">
+        <strong>Use the rest of the site as separate layers</strong>
+        <p>The candidate pages add track record and public-role context, the charts visualize what the tracker captured, and the <a href="inc-impact.html">INC implications page</a> explores what each scenario could mean if the observed pattern were taken seriously.</p>
+      </article>
+    </div>
+  </section>
+
   <section class="candidate-grid" id="candidate-grid"></section>
 
   <section class="panel">
     <h2>Methodology & Caveats</h2>
-    <p class="section-lead">This page treats the tracked window as the primary evidence base. That means the strongest conclusions come from what changed between the first and last valid snapshots, while anything about the difference between tracked flow and full source totals remains a cautious interpretation rather than a certainty.</p>
+    <p class="section-lead">This page treats the tracked window as the primary evidence base. That means the strongest claims come from what changed between the first and last valid snapshots, while anything about the source itself, the reason for the opening base, or the difference between tracked flow and full totals remains a cautious interpretation rather than a certainty. The key verified point is that the largest post-gap rows fit local offline capture outages more closely than they fit a sudden new change in the source stream.</p>
     <div class="method-grid" id="method-grid"></div>
     <div class="note-box" id="method-note"></div>
   </section>
@@ -559,7 +579,7 @@
 
   <section class="panel">
     <h2>Final Totals Comparison</h2>
-    <p class="section-lead">The first valid snapshot already contained most of the final tally. This section shows that opening base and the additional votes observed during the tracking window.</p>
+    <p class="section-lead">The first valid snapshot already contained most of the final tally. This section shows that opening base and the additional votes observed during the tracking window, which is why the site distinguishes sharply between the unexplained early stock and the votes that visibly arrived while tracking was active.</p>
     <div class="summary-grid" id="final-summary"></div>
     <div class="chart-card">
       <h3>Opening Snapshot Plus Added Votes</h3>
@@ -641,12 +661,12 @@
         <p>The party won Himachal in 2022, Karnataka in 2023, Telangana in 2023, and improved to 99 Lok Sabha seats in 2024, which gives the Kerala choice importance beyond the state itself.[4][5][6][7]</p>
       </article>
       <article class="source-card">
-        <strong>Next question</strong>
-        <p>This homepage answers what the tracker showed. The separate <a href="inc-impact.html">INC implications page</a> explores what each selection would mean for the party's opportunities and challenges.</p>
+        <strong>What remains unresolved</strong>
+        <p>This homepage answers what the tracker showed, but Venugopal's opening base remains an unresolved mystery. The separate <a href="inc-impact.html">INC implications page</a> moves beyond the audit and asks what each selection would mean for the party's opportunities and challenges.</p>
       </article>
     </div>
     <div class="note-box">
-      <strong>Neutrality rule:</strong> this site describes tracked data and publicly available context. It does not endorse any candidate.
+      <strong>Neutrality rule:</strong> this site describes tracked data and publicly available context. It does not endorse any candidate, and it does not claim to have proved whether the source poll was clean, manipulated, or something in between.
     </div>
     <ol class="sources-list">
       <li><a href="https://en.wikipedia.org/wiki/K._C._Venugopal" target="_blank" rel="noreferrer">K.C. Venugopal</a></li>
@@ -756,7 +776,8 @@
       <strong>Possible causes of mismatch between tracked flow and full totals:</strong>
       <ul>
         <li>Most votes were already present before direct tracking began, so the dataset is not a full-origin count.</li>
-        <li>Large jumps after gaps suggest some source-side changes were surfaced in batches rather than as smooth minute-by-minute updates.</li>
+        <li>The tracker was running on a laptop that was not always connected, so some large post-gap rows reflect local connectivity gaps during capture rather than a change in how the source itself was updating.</li>
+        <li>Those post-gap totals are normalized for elapsed gap time and closely match the surrounding vote rates, which supports an offline catch-up explanation.</li>
         <li>The timeout row shows at least one interval where the scraper did not capture the source in real time.</li>
         <li>Because of those limits, this page treats mismatch explanations as possibilities, not proof of any single cause.</li>
       </ul>`;
@@ -915,7 +936,7 @@
       <strong>Why the tracked flow may not fully match the source totals:</strong>
       <ul>
         <li>The tracker began after ${CMTracker.formatNumber(analytics.first.total_votes)} votes were already on the board.</li>
-        <li>The biggest jumps in the dataset tend to cluster around gaps, which is consistent with batched source updates or delayed capture.</li>
+        <li>The biggest jumps in the dataset cluster around periods when the local tracker was offline, and their gap-adjusted rates stay close to the surrounding vote pace.</li>
         <li>The dataset contains ${analytics.errorEvents.length} timeout row, which means at least one source read failed outright.</li>
         <li>Those limits justify caution. They do not justify certainty about the exact mechanism behind every mismatch.</li>
       </ul>`;
@@ -930,7 +951,7 @@
     document.getElementById("key-findings").innerHTML = `
       <article class="finding"><strong>Tracker dominance</strong><br>Satheesan captured ${CMTracker.formatPercent(analytics.captureShare.satheesan)} of all newly observed votes, while Venugopal and Chennithala each stayed near four per cent.</article>
       <article class="finding"><strong>Most of the tally came before tracking</strong><br>The first valid row already contained ${CMTracker.formatNumber(analytics.first.total_votes)} votes, which is ${CMTracker.formatPercent((analytics.first.total_votes / analytics.last.total_votes) * 100)} of the final source total.</article>
-      <article class="finding"><strong>Gap-linked bursts matter</strong><br>The largest recorded jump was ${CMTracker.formatNumber(biggestSpike.deltaTotal)} votes at ${biggestSpike.timestamp}. The longest gap in the dataset lasted ${longestGap ? longestGap.minutes.toFixed(1) : "0.0"} minutes.</article>
+      <article class="finding"><strong>Gap-linked bursts fit offline recovery</strong><br>The largest recorded jump was ${CMTracker.formatNumber(biggestSpike.deltaTotal)} votes at ${biggestSpike.timestamp}. The longest gap in the dataset lasted ${longestGap ? longestGap.minutes.toFixed(1) : "0.0"} minutes, and the main post-gap bursts align closely with the surrounding vote rates once the offline interval is taken into account.</article>
       <article class="finding"><strong>Morning was much hotter than night</strong><br>Average total additions fell from ${analytics.timeBands.morning.toFixed(1)} per recorded row in the morning to ${analytics.timeBands.night.toFixed(1)} in the 20:00-22:59 band.</article>
       <article class="finding"><strong>Venugopal vs Satheesan</strong><br>During the captured window, Satheesan added roughly ${satVsVen.toFixed(1)} times as many votes as Venugopal.</article>
       <article class="finding"><strong>Best hour for raw additions</strong><br>The heaviest hourly block was ${strongestHour ? strongestHour.label : "n/a"}, when ${CMTracker.formatNumber(strongestHour ? strongestHour.total : 0)} votes were added and Satheesan took ${strongestHour && strongestHour.total ? CMTracker.formatPercent((strongestHour.satheesan / strongestHour.total) * 100) : "-"} of that hour.</article>`;

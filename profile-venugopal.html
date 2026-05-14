@@ -110,6 +110,7 @@
   .hero-stats,
   .metric-grid,
   .swot-grid,
+  .track-grid,
   .research-grid {
     display: grid;
     gap: 12px;
@@ -155,6 +156,7 @@
     margin-bottom: 10px;
   }
 
+  .track-grid,
   .swot-grid,
   .research-grid {
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -236,6 +238,11 @@
   </section>
 
   <section class="panel">
+    <h2>Track Record</h2>
+    <div class="track-grid" id="track-record-grid"></div>
+  </section>
+
+  <section class="panel">
     <h2>Signals To Watch</h2>
     <ul id="signals-list"></ul>
     <p class="panel-note">This profile is neutral. It reads the tracked window alongside public-role context rather than treating either one as a final verdict.</p>
@@ -281,6 +288,19 @@
       <article class="research-card">${item}</article>`).join("");
   }
 
+  function renderTrackRecord(candidate) {
+    const sections = [
+      ["Successes", candidate.trackRecord.successes],
+      ["Setbacks", candidate.trackRecord.setbacks]
+    ];
+
+    document.getElementById("track-record-grid").innerHTML = sections.map(([title, items]) => `
+      <article class="research-card">
+        <strong>${title}</strong>
+        <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
+      </article>`).join("");
+  }
+
   async function init() {
     const candidate = CMTracker.CANDIDATES[PROFILE_KEY];
     document.title = `${candidate.name} | Kerala CM 2026 Profile`;
@@ -309,6 +329,7 @@
       document.getElementById("signals-list").innerHTML = candidate.signals.map((item) => `<li>${item}</li>`).join("");
       renderSwot(candidate);
       renderResearch(candidate);
+      renderTrackRecord(candidate);
 
       const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
       if (image) {

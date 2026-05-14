@@ -20,6 +20,16 @@
         "K.C. Venugopal is the AICC general secretary handling organisation and is also a Lok Sabha MP from Alappuzha.[1]",
         "His public resume includes Union ministerial work and three terms as an MLA, giving him strong national-state linkages.[1]"
       ],
+      trackRecord: {
+        successes: [
+          "His resume stretches across MLA, MP and Union ministerial roles, which gives him one of the broadest state-to-national political careers in the field.[1]",
+          "Rising to an AICC organisation leadership role suggests a track record of trust inside the party structure and experience with national coordination.[1]"
+        ],
+        setbacks: [
+          "That same record is weighted toward organisation and parliamentary work, so it offers fewer recent Kerala executive deliverables than a state-first campaign would ideally highlight.",
+          "Many of his strongest successes are internal and organisational, which makes them harder to convert into a visible public-mandate story than a more directly state-facing track record."
+        ]
+      },
       swot: {
         strengths: [
           "Direct access to the national party structure and organisational machinery.",
@@ -62,6 +72,16 @@
         "V.D. Satheesan represented Paravur from 2001 and served as Kerala's Leader of the Opposition from 2021 to 2026.[2]",
         "His legislative profile gives him the clearest public-facing continuity argument after the UDF win.[2][4]"
       ],
+      trackRecord: {
+        successes: [
+          "A long run as Paravur MLA and a full term as Leader of the Opposition gave him the clearest recent state-level leadership profile among the three contenders.[2]",
+          "His public track record is strongest in legislative combat, visibility and message discipline, which aligns naturally with a mandate-facing CM pitch.[2]"
+        ],
+        setbacks: [
+          "His record is lighter on ministerial or cabinet delivery than some rivals, so the case for him relies more on legislative leadership than on executive governance.",
+          "Because he became the most visible anti-LDF face, any weakness in the opposition years attaches to him more directly than it would to a lower-profile contender."
+        ]
+      },
       swot: {
         strengths: [
           "Dominated the tracked window by a very wide margin in both absolute additions and share capture.",
@@ -104,6 +124,16 @@
         "Ramesh Chennithala is a permanent invitee to the Congress Working Committee and a former Kerala Leader of the Opposition.[3]",
         "He also served as KPCC president and later as Kerala Home Minister, giving him the deepest veteran resume in the field.[3]"
       ],
+      trackRecord: {
+        successes: [
+          "His record spans KPCC president, Kerala Home Minister, Leader of the Opposition and permanent invitee to the Congress Working Committee, giving him the deepest institutional resume in the field.[3]",
+          "That breadth gives him the strongest case on continuity, seniority and internal reconciliation when the party values veteran stewardship.[3]"
+        ],
+        setbacks: [
+          "The veteran profile is easier to defend on stability grounds than on a renewal story, which can be a weakness when the party wants to signal a fresh post-victory direction.",
+          "His strongest achievements belong to earlier Congress cycles, so the research case is rich on experience but thinner on a why-now argument tied to a new mandate."
+        ]
+      },
       swot: {
         strengths: [
           "Carries the most extensive institutional memory and faction-management experience among the three contenders.",

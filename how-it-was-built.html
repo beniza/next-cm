@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How This System Was Built | Kerala CM 2026</title>
+<style>
+  :root {
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --paper: #fffaf0;
+    --line: #d6c7a8;
+    --accent: #9a3412;
+    --soft: #fdf8ee;
+    --tracker: #7c3aed;
+    --dash: #2563eb;
+    --research: #047857;
+    --site: #c2410c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100vh;
+    padding: 24px;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.12), transparent 28%),
+      radial-gradient(circle at 84% 12%, rgba(194, 65, 12, 0.12), transparent 24%),
+      linear-gradient(120deg, #f7f0e4 0%, #efe5d3 48%, #faf3e7 100%);
+  }
+
+  .shell {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .back-link,
+  .hero-links a {
+    text-decoration: none;
+    color: #7c2d12;
+    border: 1px solid #d97706;
+    border-radius: 10px;
+    padding: 8px 12px;
+    background: #fffbeb;
+    font-size: 0.86rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+
+  .hero,
+  .panel,
+  .step-card,
+  .quote-card,
+  .note-box {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+  }
+
+  .hero,
+  .panel {
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+    border-radius: 999px;
+    padding: 4px 10px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    color: #7c2d12;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    color: #7c2d12;
+    font-size: 1.24rem;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    color: #7c2d12;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+
+  p,
+  li,
+  blockquote,
+  .note-box {
+    color: #4b5563;
+    line-height: 1.65;
+  }
+
+  .hero-links,
+  .steps,
+  .quote-grid,
+  .evidence-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .hero-links {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-top: 14px;
+  }
+
+  .steps,
+  .quote-grid,
+  .evidence-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .step-card,
+  .quote-card {
+    border-radius: 16px;
+    padding: 16px;
+    background: #fff;
+  }
+
+  .step-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .tracker { border-left: 4px solid var(--tracker); }
+  .dashboard { border-left: 4px solid var(--dash); }
+  .research { border-left: 4px solid var(--research); }
+  .site { border-left: 4px solid var(--site); }
+
+  blockquote {
+    margin: 0;
+    padding: 14px;
+    border-left: 4px solid #d97706;
+    background: var(--soft);
+    border-radius: 12px;
+    font-size: 0.96rem;
+    white-space: pre-wrap;
+  }
+
+  ul,
+  ol {
+    padding-left: 18px;
+  }
+
+  li { margin-bottom: 8px; }
+
+  .note-box {
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 14px;
+    background: #fffdf5;
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <a class="back-link" href="index.html">Back to candidate hub</a>
+
+  <section class="hero">
+    <span class="eyebrow">Build Story</span>
+    <h1>How This System Was Built</h1>
+    <p>This page explains how the CM briefing moved from raw capture to a readable decision surface. The work started as a tracker, became a dashboard, widened into research, and ended as the tracked-window-first site now linked from the homepage. AI tools mainly Claude Opus and Codex were used to accelerate restructuring, synthesis and implementation, but the direction stayed anchored in the prompt trail and the evidence collected along the way.</p>
+    <div class="hero-links">
+      <a href="dashboard.html">Open legacy dashboard</a>
+      <a href="inc-impact.html">Open INC implications page</a>
+      <a href="index.html">Return to main briefing</a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>The Build Sequence</h2>
+    <div class="steps">
+      <article class="step-card tracker">
+        <span class="step-kicker">Step 1</span>
+        <h3>Tracker</h3>
+        <p>The first layer was a live capture system that logged vote totals, percentage shifts, deltas, gaps and alerts into the raw CSV history. That established a reproducible record instead of relying on impressions from one moment on the source page.</p>
+      </article>
+      <article class="step-card dashboard">
+        <span class="step-kicker">Step 2</span>
+        <h3>Dashboard</h3>
+        <p>The second layer turned the capture stream into a readable dashboard. It surfaced movement, spikes, gap-linked jumps and alerts so the recorded window could be seen as a developing story rather than as isolated numbers.</p>
+      </article>
+      <article class="step-card research">
+        <span class="step-kicker">Step 3</span>
+        <h3>Research</h3>
+        <p>The third layer added public-role context, candidate track records, wider INC context and caution around mismatch causes. That step made it possible to interpret the poll without pretending the tracker alone answered every political question.</p>
+      </article>
+      <article class="step-card site">
+        <span class="step-kicker">Step 4</span>
+        <h3>Final Site</h3>
+        <p>The last layer reorganised everything into a first-visit briefing: homepage, candidate profiles, INC implications page and this build-history page. The result is a single surface that keeps the tracked window primary while still showing the research and the caveats around it.</p>
+      </article>
+    </div>
+    <div class="note-box">
+      <strong>Evidence chain:</strong> tracker data created the record, the dashboard exposed patterns inside that record, research gave those patterns political context, and the final site arranged the material so a newcomer could use it to think about the next CM question without starting from rumours.
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Prompt Trail</h2>
+    <p>The direction of the site changed through explicit prompts. The quotes below are included verbatim because they show how the system was shaped, corrected and tightened over time.</p>
+    <div class="quote-grid">
+      <article class="quote-card"><blockquote>three changes required. but plan them first, get my approval and then implement</blockquote></article>
+      <article class="quote-card"><blockquote>add a page showing how I built this system. I created a tracker, then a dashboard, conducted a research, then this site with the help of ai tools (mainly Claude Opus and Codex)</blockquote></article>
+      <article class="quote-card"><blockquote>The individual profile pages of candidates should include our research findings on their track records (successes and setback)</blockquote></article>
+      <article class="quote-card"><blockquote>We need to rewrite the content of this page for a first time visiot. it should be clear to the user about the purpose and how it will help him in answering the questions on the next cm.</blockquote></article>
+      <article class="quote-card"><blockquote>include my prompts `verbatim`.</blockquote></article>
+      <article class="quote-card"><blockquote>partially agree. I don't want the questions to be presented explicitely. we are narrating a story. those questions should be answered organically.</blockquote></article>
+      <article class="quote-card"><blockquote>the site flickers (may be due to refreshing). see if the site can refresh without flickering, or make the refresh time to 10 mins.</blockquote></article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>What Each Layer Added</h2>
+    <div class="evidence-grid">
+      <article class="step-card">
+        <h3>From tracker to dashboard</h3>
+        <p>The system stopped being just a log file and became a surface that could show spikes, capture shares, hourly changes and alert rows.</p>
+      </article>
+      <article class="step-card">
+        <h3>From dashboard to research</h3>
+        <p>The numbers were no longer treated as self-explanatory. Candidate roles, track records and INC context were added so the briefing could explain what a selection might mean, not just who moved where.</p>
+      </article>
+      <article class="step-card">
+        <h3>From research to site</h3>
+        <p>The final site reorganised the material for decision-making: start with tracked-window evidence, move to the candidate pages for depth, then use the INC implications page for the wider political read.</p>
+      </article>
+    </div>
+    <div class="note-box">
+      <strong>AI role:</strong> Claude Opus and Codex helped accelerate implementation, iteration and restructuring. They did not replace the need to choose the analytical lens, check the mismatches in the data, or decide how the story should be told.
+    </div>
+  </section>
+</div>
+</body>
+</html>

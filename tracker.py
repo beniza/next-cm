@@ -205,7 +205,7 @@ def generate_dashboard():
   <div id="alertsContainer"><p class="empty">Loading alerts...</p></div>
 </div>
 
-<p class="refresh">Updates every minute. <a href="#" onclick="location.reload();return false;" style="color:#60a5fa;">Refresh</a> for immediate reload.</p>
+<p class="refresh">Updates every 10 minutes. <a href="#" onclick="location.reload();return false;" style="color:#60a5fa;">Refresh</a> for immediate reload.</p>
 
 <script>
 let deltaChart;
@@ -390,9 +390,9 @@ function parseCSV(text) {
   return rows;
 }
 
-// Load on startup and refresh every 1 minute (60000ms)
+// Load on startup and refresh every 10 minutes (600000ms)
 loadData();
-setInterval(loadData, 60000);
+setInterval(loadData, 600000);
 </script>
 </body>
 </html>"""
