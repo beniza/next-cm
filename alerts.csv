@@ -4,3 +4,8 @@ timestamp,alert
 2026-05-13 16:15:04,"SPIKE Satheesan: +270 votes/min (avg 42, std 16, threshold 89)"
 2026-05-13 21:42:59,"SPIKE Satheesan: +461 votes/min (avg 12, std 3, threshold 22)"
 2026-05-14 04:27:27,ERROR: <urlopen error timed out>
+2026-05-14 08:45:05,ERROR: <urlopen error timed out>
+2026-05-14 08:46:35,ERROR: <urlopen error timed out>
+2026-05-14 08:47:35,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
+2026-05-14 08:48:36,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
+2026-05-14 08:49:36,ERROR: <urlopen error [Errno 11001] getaddrinfo failed>
