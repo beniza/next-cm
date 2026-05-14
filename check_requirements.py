@@ -42,6 +42,8 @@ def main() -> int:
     require(index, "inc-impact.html", "homepage INC implications link")
     require(index, "how-it-was-built.html", "homepage build-story link")
     require(index, "How This Was Built", "homepage build-story label")
+    require(index, "https://www.thenextcm.com/", "homepage source link url")
+    require(index, "Visit the source under audit", "homepage source link label")
     require(index, "Key Findings", "homepage insights section")
     require(index, "Start Here", "homepage first-visit section")
     require(index, "unofficial Kerala CM poll", "homepage source-status framing")
@@ -79,6 +81,8 @@ def main() -> int:
     require(inc_impact, "Scenario Lens", "INC impact scenario section")
 
     require(build_story, "How This System Was Built", "build-story title")
+    require(build_story, "Source under audit", "build-story source provenance section")
+    require(build_story, "thenextcm.com was the public page being tracked", "build-story source provenance explanation")
     require(build_story, "three changes required. but plan them first, get my approval and then implement", "build-story quoted prompt")
     require(build_story, "add a page showing how I built this system. I created a tracker, then a dashboard, conducted a research, then this site with the help of ai tools (mainly Claude Opus and Codex)", "build-story build prompt")
     require(build_story, "The individual profile pages of candidates should include our research findings on their track records (successes and setback)", "build-story profile prompt")

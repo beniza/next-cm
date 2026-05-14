@@ -97,6 +97,44 @@
     margin-top: 14px;
   }
 
+  .source-callout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border: 1px solid #f59e0b;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fff7d6 0%, #fffaf0 100%);
+  }
+
+  .source-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9a3412;
+    margin-bottom: 6px;
+  }
+
+  .source-callout p {
+    color: #4b5563;
+    line-height: 1.55;
+  }
+
+  .source-link {
+    text-decoration: none;
+    color: #fff;
+    background: #9a3412;
+    border: 1px solid #7c2d12;
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgba(154, 52, 18, 0.2);
+  }
+
   .hero-actions a,
   .card-link,
   .panel-link {
@@ -479,6 +517,8 @@
     body { padding: 16px; }
     .candidate-head { grid-template-columns: 1fr; }
     .candidate-head img { width: 96px; height: 96px; }
+    .source-callout { grid-template-columns: 1fr; }
+    .source-link { width: 100%; text-align: center; }
   }
 </style>
 </head>
@@ -488,6 +528,13 @@
     <span class="eyebrow">Audit Briefing</span>
     <h1>Kerala CM 2026 Poll Audit And Candidate Briefing</h1>
     <p class="sub">This site begins with an unofficial Kerala CM poll hosted at thenextcm.com. We could not establish who owns thenextcm.com or when it was launched, so the source itself has to be treated cautiously. Our experiment was simple: track the public-facing vote stream over time, audit whether it looked obviously dumped or more continuously updated, and then ask what the captured record actually showed, including what happened across the local connectivity gaps during capture.</p>
+    <div class="source-callout">
+      <div>
+        <span class="source-kicker">Source under audit</span>
+        <p>This analysis starts from the public poll page itself. If you want to inspect the exact source being discussed before reading the audit, use the direct link here.</p>
+      </div>
+      <a class="source-link" href="https://www.thenextcm.com/" target="_blank" rel="noopener noreferrer">Visit the source under audit</a>
+    </div>
     <div class="hero-actions">
       <a href="inc-impact.html">What the CM choice means for INC</a>
       <a href="how-it-was-built.html">How This Was Built</a>
