@@ -280,6 +280,17 @@
 </head>
 <body>
 <div class="shell">
+  <div id="google_translate_element" style="text-align:right; margin-bottom: 10px;"></div>
+  <script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'ml',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   <section class="hero">
     <span class="eyebrow">Scenario Analysis</span>
     <h1>What The CM Choice Means For INC</h1>
