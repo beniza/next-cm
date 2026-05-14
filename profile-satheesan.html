@@ -111,7 +111,8 @@
   .metric-grid,
   .swot-grid,
   .track-grid,
-  .research-grid {
+  .research-grid,
+  .quote-grid {
     display: grid;
     gap: 12px;
   }
@@ -162,8 +163,14 @@
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   }
 
+  .quote-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-top: 12px;
+  }
+
   .swot-card,
-  .research-card {
+  .research-card,
+  .quote-card {
     border-radius: 14px;
     padding: 14px;
     background: #fff;
@@ -186,6 +193,37 @@
   .panel-note {
     margin-top: 12px;
     font-size: 0.9rem;
+  }
+
+  .public-summary {
+    margin-bottom: 12px;
+  }
+
+  .section-subhead {
+    margin: 14px 0 0;
+  }
+
+  .score-note,
+  .quote-meta {
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .score-note {
+    margin-top: 8px;
+  }
+
+  .quote-card blockquote {
+    margin: 0 0 10px;
+    color: #374151;
+    font-style: italic;
+  }
+
+  .quote-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: #1d4ed8;
   }
 
   .sources a { color: #1d4ed8; }
@@ -240,6 +278,15 @@
   <section class="panel">
     <h2>Track Record</h2>
     <div class="track-grid" id="track-record-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Public Perception</h2>
+    <p class="public-summary" id="public-perception-summary">Loading...</p>
+    <div class="metric-grid" id="public-score-grid"></div>
+    <div class="research-grid" id="public-perception-grid"></div>
+    <h3 class="section-subhead">Interesting Direct Quotes</h3>
+    <div class="quote-grid" id="quote-grid"></div>
   </section>
 
   <section class="panel">
@@ -302,6 +349,35 @@
       </article>`).join("");
   }
 
+  function renderPublicPerception(candidate) {
+    const perception = candidate.publicPerception;
+    const sections = [
+      ["Going For Them", perception.goingFor],
+      ["Going Against Them", perception.goingAgainst],
+      ["Top Positives", perception.topPositives],
+      ["Top Criticism", perception.topCriticism]
+    ];
+
+    document.getElementById("public-perception-summary").textContent = perception.summary;
+    document.getElementById("public-score-grid").innerHTML = `
+      <div class="stat">
+        <span class="label">Overall Score</span>
+        <div class="value">${perception.overallScore}/100</div>
+        <div class="score-note">Directional read from accessible public YouTube and Reddit discussion, not a scientific poll.</div>
+      </div>`;
+    document.getElementById("public-perception-grid").innerHTML = sections.map(([title, items]) => `
+      <article class="research-card">
+        <strong>${title}</strong>
+        <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
+      </article>`).join("");
+    document.getElementById("quote-grid").innerHTML = perception.quotes.map((quote) => `
+      <article class="quote-card">
+        <blockquote>"${quote.text}"</blockquote>
+        <div class="quote-meta">${quote.source}</div>
+        <a class="quote-link" href="${quote.url}" target="_blank" rel="noreferrer">Open source</a>
+      </article>`).join("");
+  }
+
   async function init() {
     const candidate = CMTracker.CANDIDATES[PROFILE_KEY];
     document.title = `${candidate.name} | Kerala CM 2026 Profile`;
@@ -331,6 +407,7 @@
       renderSwot(candidate);
       renderResearch(candidate);
       renderTrackRecord(candidate);
+      renderPublicPerception(candidate);
 
       const image = await CMTracker.loadWikipediaImage(candidate.wikiTitle);
       if (image) {

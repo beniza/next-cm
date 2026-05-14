@@ -30,6 +30,47 @@
           "Many of his strongest successes are internal and organisational, which makes them harder to convert into a visible public-mandate story than a more directly state-facing track record."
         ]
       },
+      publicPerception: {
+        overallScore: 59,
+        summary: "Across accessible YouTube and Reddit discussion, Venugopal is read more as an organisation and high-command candidate than as a mass-emotion candidate. The tone around him is strategic and factional rather than openly wave-like.",
+        goingFor: [
+          "He is often treated as disciplined, organisationally strong and trusted by the national Congress leadership.",
+          "Supportive chatter values his Delhi access and coordination skills if the party wants a system-first CM choice.",
+          "He benefits from a perception that he can keep the Congress machine aligned when the contest becomes internally tense."
+        ],
+        goingAgainst: [
+          "A recurring skepticism is that he feels like an insider's candidate rather than the most organically felt public choice in Kerala.",
+          "Discussion about him is often framed around lobbying, backing and high-command preference, not broad emotional pull.",
+          "Critics read his rise through the lens of backstage influence more than public-ground enthusiasm."
+        ],
+        topPositives: [
+          "Strong organiser with visible central leadership trust.",
+          "Associated with discipline, coordination and campaign execution.",
+          "Can attract visible supporter mobilisation when the contest sharpens."
+        ],
+        topCriticism: [
+          "Weaker mass-connect image than a more public-facing rival.",
+          "Too identified with Delhi or Congress high command.",
+          "Public enthusiasm for him can look organised rather than spontaneous."
+        ],
+        quotes: [
+          {
+            text: "Congress workers in Kerala are giving abhishekam to flex boards of KC Venugopal and demanding 'KC for CM'.",
+            source: "Reddit post title",
+            url: "https://www.reddit.com/r/KeralaSpeaks/comments/1tb65a2/congress_workers_in_kerala_are_giving_abhishekam/"
+          },
+          {
+            text: "KC Venugopal's efforts to organize Bharat Jodo Yatra was instrumental in Rahul Gandhi becoming Leader of Opposition",
+            source: "Reddit post title",
+            url: "https://www.reddit.com/r/Kerala/comments/1smsx4p/kc_venugopals_efforts_to_organize_bharat_jodo/"
+          },
+          {
+            text: "What if KC Venugopal is playing the game to fail?",
+            source: "Reddit thread title",
+            url: "https://www.reddit.com/r/Kerala/comments/1t6ndf6/what_if_kc_venugopal_is_playing_the_game_to_fail/"
+          }
+        ]
+      },
       swot: {
         strengths: [
           "Direct access to the national party structure and organisational machinery.",
@@ -82,6 +123,47 @@
           "Because he became the most visible anti-LDF face, any weakness in the opposition years attaches to him more directly than it would to a lower-profile contender."
         ]
       },
+      publicPerception: {
+        overallScore: 74,
+        summary: "Satheesan generates the strongest live online conversation of the three. He is treated as the most politically relevant and public-facing contender, but he also attracts the sharpest scrutiny.",
+        goingFor: [
+          "He is seen as the most visible opposition-face contender and the one carrying current online momentum.",
+          "Supportive discussion values his sharp public style and willingness to confront opponents directly.",
+          "He benefits from being read as a mandate-facing rather than purely insider-facing choice."
+        ],
+        goingAgainst: [
+          "Skeptics repeatedly question whether media presence and opposition sharpness translate into constituency or executive delivery.",
+          "He attracts criticism that his vision can sound over-packaged or PR-heavy.",
+          "Some discussions cast him as combative or anti-development rather than governance-ready."
+        ],
+        topPositives: [
+          "Strong opposition leader image.",
+          "Highest relevance and emotional energy in the current online conversation.",
+          "Perceived as a forward-looking contender rather than a fallback."
+        ],
+        topCriticism: [
+          "Constituency track record gets questioned.",
+          "Some doubt whether he is suitable for the CM role.",
+          "Critics argue that the image can run ahead of the record."
+        ],
+        quotes: [
+          {
+            text: "I suppose most people are happy to have a strong opposition leader while the state is ruled by a much stronger LDF govt.",
+            source: "Reddit r/Kerala discussion",
+            url: "https://www.reddit.com/r/Kerala/comments/nif3bc/brief_but_informative_video_on_v_d_satheesan/"
+          },
+          {
+            text: "No major change in Paravoor for last 25 years.",
+            source: "Reddit r/Kerala comment",
+            url: "https://www.reddit.com/r/Kerala/comments/1t7fqah/comment/okope5z/"
+          },
+          {
+            text: "I don't think he is suitable to be a CM. He failed as a MLA SO i have my own inhibitions about how he will perform as a CM.",
+            source: "Reddit r/Kerala comment",
+            url: "https://www.reddit.com/r/Kerala/comments/1hrorjx/comment/m4zdg1a/"
+          }
+        ]
+      },
       swot: {
         strengths: [
           "Dominated the tracked window by a very wide margin in both absolute additions and share capture.",
@@ -132,6 +214,47 @@
         setbacks: [
           "The veteran profile is easier to defend on stability grounds than on a renewal story, which can be a weakness when the party wants to signal a fresh post-victory direction.",
           "His strongest achievements belong to earlier Congress cycles, so the research case is rich on experience but thinner on a why-now argument tied to a new mandate."
+        ]
+      },
+      publicPerception: {
+        overallScore: 56,
+        summary: "Chennithala is discussed with more respect than excitement. He comes through as the experience and administrative-memory candidate, but not the one generating the strongest emotional wave.",
+        goingFor: [
+          "He is often credited with deeper administrative experience and steadier institutional grounding.",
+          "Supportive voices treat him as a safer and more seasoned hand in comparison debates.",
+          "His case improves when the conversation shifts from momentum to governance maturity."
+        ],
+        goingAgainst: [
+          "He does not generate the same urgency or online excitement as the more current contenders.",
+          "Some discussions frame him as yesterday's Congress style rather than a renewal choice.",
+          "His support online sounds pragmatic and comparative more than passionate."
+        ],
+        topPositives: [
+          "Administrative experience.",
+          "Seen as steady and institutionally credible.",
+          "Benefits when the mood favors veteran stewardship over campaign energy."
+        ],
+        topCriticism: [
+          "Lower excitement factor.",
+          "Backward-looking or conventional image.",
+          "Harder to build a strong why-now argument around him."
+        ],
+        quotes: [
+          {
+            text: "Chennithala has at least administrative experience which will be of great help.",
+            source: "Reddit r/Kerala thread snippet",
+            url: "https://www.reddit.com/r/Kerala/comments/1hrorjx/ramesh_chennithala_vs_vd_satheeshan_who_is_better/"
+          },
+          {
+            text: "RC is way better.",
+            source: "Reddit r/Kerala comment",
+            url: "https://www.reddit.com/r/Kerala/comments/1hrorjx/comment/m4zgh6r/"
+          },
+          {
+            text: "Ramesh Chennithala. He was a better opposition leader than V D Satheeshan.",
+            source: "Reddit r/Kerala comment",
+            url: "https://www.reddit.com/r/Kerala/comments/1hrorjx/comment/m4zb8no/"
+          }
         ]
       },
       swot: {
